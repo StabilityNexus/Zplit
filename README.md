@@ -3,7 +3,7 @@
 
 <!-- Organization Logo -->
 <div align="center" style="display: flex; align-items: center; justify-content: center; gap: 16px;">
-  <img alt="Stability Nexus" src="public/stability.svg" width="175">
+  <img alt="Stability Nexus" src="assets/stability.svg" width="175">
   <img src="public/todo-project-logo.svg" width="175" />
 </div>
 
@@ -12,7 +12,7 @@
 <!-- Organization Name -->
 <div align="center">
 
-[![Static Badge](https://img.shields.io/badge/Stability_Nexus-/TODO-228B22?style=for-the-badge&labelColor=FFC517)](https://TODO.stability.nexus/)
+[![Static Badge](https://img.shields.io/badge/Stability_Nexus-Zplit-228B22?style=for-the-badge&labelColor=FFC517)](https://TODO.stability.nexus/)
 
 <!-- Correct deployed url to be added -->
 
@@ -48,34 +48,28 @@
 ---
 
 <div align="center">
-<h1>TODO: Project Name</h1>
+<h1>Zplit</h1>
 </div>
 
-[TODO](https://TODO.stability.nexus/) is a ... TODO: Project Description.
+**Zplit** is an open-source mobile application designed to simplify group expense management through a **decentralized architecture**.
+
+Zplit's Core Features are — **expense tracking**, **group management**, and **debt calculation** — while prioritizing **user data privacy**, **offline functionality**, and **peer-to-peer synchronization**.
 
 ---
 
 ## Tech Stack
 
-TODO:
-
 ### Frontend
 
-TODO:
-
-- Next.js 14+ (React)
-- TypeScript
-- TailwindCSS
-- shadcn/ui
+- Flutter
+- FL Chart
+- State Management - Riverpod
+- Storage - Hive/Drift
+- P2P Methods - WiFi Direct, Bluetooth, NFC plugins
 
 ### Blockchain
 
-TODO:
-
-- Wagmi
-- Solidity Smart Contracts
-- Ethers.js
-- Rainbow-Kit Wallet Integration
+TBD
 
 ---
 
@@ -83,21 +77,16 @@ TODO:
 
 ### Prerequisites
 
-TODO
-
-- Node.js 18+
-- npm/yarn/pnpm
-- MetaMask or any other web3 wallet browser extension
+- Flutter
+- Android Studio/Xcode
 
 ### Installation
-
-TODO
 
 #### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/StabilityNexus/TODO.git
-cd TODO
+git clone https://github.com/StabilityNexus/zplit.git
+cd zplit
 ```
 
 #### 2. Install Dependencies
@@ -105,11 +94,7 @@ cd TODO
 Using your preferred package manager:
 
 ```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
+flutter pub get
 ```
 
 #### 3. Run the Development Server
@@ -117,18 +102,9 @@ pnpm install
 Start the app locally:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+flutter run
 ```
 
-#### 4. Open your Browser
-
-Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
-
----
 
 ## Contributing
 
@@ -137,9 +113,7 @@ We welcome contributions of all kinds! To contribute:
 1. Fork the repository and create your feature branch (`git checkout -b feature/AmazingFeature`).
 2. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
 3. Run the development workflow commands to ensure code quality:
-   - `npm run format:write`
-   - `npm run lint:fix`
-   - `npm run typecheck`
+   - `flutter test`
 4. Push your branch (`git push origin feature/AmazingFeature`).
 5. Open a Pull Request for review.
 
