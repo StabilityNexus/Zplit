@@ -1,0 +1,13 @@
+{
+  "name": "zplit-website",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static website for Zplit: marketing and Android asset links.",
+  "scripts": {
+    "dev": "http-server website -p 5173 -c-1",
+    "serve": "http-server website -p 5173 -c-1"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

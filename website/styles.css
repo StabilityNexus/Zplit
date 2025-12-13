@@ -1,0 +1,118 @@
+/* Minimal, clean, sleek theme with green hues */
+:root {
+  --bg: #0b0f0d;
+  --surface: #111714;
+  --border: #1c221e;
+  --text: #e7f3ea;
+  --muted: #a7b7ad;
+  --primary: #22c55e; /* green-500 */
+  --primary-600: #16a34a;
+  --primary-700: #15803d;
+  --shadow: 0 1px 2px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.16);
+}
+
+[data-theme="light"] {
+  --bg: #f7faf7;
+  --surface: #ffffff;
+  --border: #e3e9e4;
+  --text: #0c120e;
+  --muted: #5b6b60;
+  --shadow: 0 1px 2px rgba(0,0,0,0.06), 0 8px 20px rgba(0,0,0,0.08);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  backdrop-filter: saturate(180%) blur(8px);
+  background: color-mix(in oklab, var(--bg) 85%, transparent);
+  border-bottom: 1px solid var(--border);
+  z-index: 20;
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+.brand-mark {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: grid; place-items: center;
+  background: var(--primary-700);
+  color: #fff; font-weight: 700;
+}
+.brand-name { font-weight: 600; letter-spacing: 0.3px; }
+.nav { display: flex; gap: 20px; }
+.nav a { color: var(--text); text-decoration: none; font-size: 15px; opacity: 0.9; }
+.nav a:hover { opacity: 1; }
+.icon-button { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 8px; height: 36px; width: 36px; box-shadow: var(--shadow); cursor: pointer; }
+
+.hero { padding: 72px 0 36px; border-bottom: 1px solid var(--border); }
+.hero-inner { text-align: center; }
+.lead { margin-top: 12px; font-size: 18px; color: var(--muted); }
+.cta { margin-top: 24px; display: flex; gap: 12px; justify-content: center; }
+
+.button {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 10px 16px; border-radius: 10px; text-decoration: none;
+  border: 1px solid var(--border); color: var(--text); background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.button.primary { background: var(--primary); border-color: transparent; color: #06210e; font-weight: 600; }
+.button.outline { background: transparent; }
+.button:hover { filter: brightness(1.05); }
+
+.section { padding: 48px 0; }
+.section.alt { background: color-mix(in oklab, var(--surface) 60%, var(--bg)); }
+
+.feature-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.guidelines-grid { margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+
+.screens-grid { margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.screen-card { overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); }
+.screen-card img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; }
+.screen-copy { padding: 14px 16px; }
+.screen-copy h3 { margin: 0 0 6px; }
+.deadline { margin-top: 8px; color: var(--muted); }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+
+.site-footer { border-top: 1px solid var(--border); }
+.footer-inner { min-height: 64px; display: flex; align-items: center; justify-content: space-between; }
+
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] {
+    --bg: #f7faf7;
+    --surface: #ffffff;
+    --border: #e3e9e4;
+    --text: #0c120e;
+    --muted: #5b6b60;
+    --shadow: 0 1px 2px rgba(0,0,0,0.06), 0 8px 20px rgba(0,0,0,0.08);
+  }
+}
