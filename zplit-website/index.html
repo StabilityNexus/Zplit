@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zplit – Split Bills Instantly</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1DB954',
+            darkgreen: '#0F3D2E',
+            softgray: '#F5F7F6',
+            mint: '#DFF5EA'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-white text-gray-800 font-sans">
+
+  <!-- NAVBAR -->
+  <header class="fixed top-0 w-full bg-white/80 backdrop-blur border-b border-gray-100 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="text-xl font-semibold text-darkgreen">Zplit</div>
+      <nav class="hidden md:flex gap-8 text-sm text-gray-600">
+        <a href="#features" class="hover:text-primary">Features</a>
+        <a href="#how" class="hover:text-primary">How it Works</a>
+        <a href="#security" class="hover:text-primary">Security</a>
+        <a href="#download" class="hover:text-primary">Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="pt-32 pb-24 bg-gradient-to-br from-white to-mint">
+    <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <h1 class="text-4xl md:text-5xl font-semibold text-darkgreen leading-tight">
+          Split bills instantly.<br />Settle fairly.
+        </h1>
+        <p class="mt-6 text-gray-600 max-w-md">
+          Zplit helps you split expenses with friends seamlessly, transparently, and without confusion.
+        </p>
+        <div class="mt-8 flex gap-4">
+          <a href="#download" class="bg-primary text-white px-6 py-3 rounded-lg text-sm font-medium hover:opacity-90">
+            Get the App
+          </a>
+          <a href="#features" class="text-primary font-medium px-6 py-3">
+            Learn More
+          </a>
+        </div>
+      </div>
+
+      <!-- App Mockup Placeholder -->
+      <div class="flex justify-center">
+        <div class="w-74 h-[450px] bg-white rounded-3xl shadow-xl flex items-center justify-center text-gray-400">
+          <img src="../assets/img-3.png" alt="app screenshot"  />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-3xl font-medium text-darkgreen text-center">Why Zplit?</h2>
+
+      <div class="mt-16 grid md:grid-cols-4 gap-8">
+        <div class="p-6 bg-softgray rounded-xl">
+          <h3 class="font-medium text-darkgreen">Instant Splits</h3>
+          <p class="mt-2 text-sm text-gray-600">Split expenses in seconds with no math hassle.</p>
+          <img src="../assets/HOW-1.webp" alt="" class=" ">
+        </div>
+        <div class="p-6 bg-softgray rounded-xl">
+          <h3 class="font-medium text-darkgreen">Transparent</h3>
+          <p class="mt-2 text-sm text-gray-600">Everyone sees exactly what they owe.</p>
+          <img src="../assets/htw-4.webp" alt="">
+        </div>
+        <div class="p-6 bg-softgray rounded-xl">
+          <h3 class="font-medium text-darkgreen">Group Friendly</h3>
+          <p class="mt-2 text-sm text-gray-600">Perfect for trips, rooms, and teams.</p>
+          <img src="../assets/htw-3.webp" alt="">
+        </div>
+        <div class="p-6 bg-softgray rounded-xl">
+          <h3 class="font-medium text-darkgreen">Secure</h3>
+          <p class="mt-2 text-sm text-gray-600">Built with security and privacy in mind.</p>
+          <img src="../assets/htw-1.webp" alt="">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how" class="py-24 bg-softgray">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl font-medium text-darkgreen text-center">How It Works</h2>
+
+      <div class="mt-16 grid md:grid-cols-3 gap-10 text-center">
+        <div>
+          <div class="text-primary text-4xl font-semibold">1</div>
+          <p class="mt-4 text-gray-700">Add friends & expenses</p>
+          
+        </div>
+        <div>
+          <div class="text-primary text-4xl font-semibold">2</div>
+          <p class="mt-4 text-gray-700">Zplit calculates shares</p>
+        </div>
+        <div>
+          <div class="text-primary text-4xl font-semibold">3</div>
+          <p class="mt-4 text-gray-700">Settle with clarity</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECURITY -->
+  <section id="security" class="py-24 bg-white">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <h2 class="text-3xl font-medium text-darkgreen">Security & Trust</h2>
+
+      <div class="mt-12 space-y-4 text-gray-600">
+        <p>✓ Your data stays yours</p>
+        <p>✓ No hidden calculations</p>
+        <p>✓ Built with transparency in mind</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="download" class="py-24 bg-gradient-to-br from-mint to-white">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <h2 class="text-3xl font-medium text-darkgreen">Ready to split smarter?</h2>
+      <div class="mt-8 flex justify-center gap-4">
+        <button class="bg-primary text-white px-8 py-3 rounded-lg text-sm font-medium">
+        <a href="#" class="block">
+          Download for Android
+          </a>
+        </button>
+        <button class="border border-primary text-primary px-8 py-3 rounded-lg text-sm font-medium">
+          iOS Coming Soon
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-darkgreen text-white py-10">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-sm">© 2025 Zplit</p>
+      <div class="flex gap-6 text-sm">
+        <a href="#" class="hover:underline">Privacy</a>
+        <a href="#" class="hover:underline">Terms</a>
+        <a href="#" class="hover:underline">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
