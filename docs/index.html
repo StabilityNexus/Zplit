@@ -1,0 +1,885 @@
+<!--
+Zplit Landing Page
+Copyright (C) 2025 The Stable Order
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="../assets/stability.svg">
+    
+    <!-- Primary Meta Tags -->
+    <title>Zplit - Split Payments, Not Friendships</title>
+    <meta name="title" content="Zplit - Split Payments, Not Friendships">
+    <meta name="description" content="An open-source, decentralized payment splitting app. Share expenses seamlessly with friends, roommates, or colleagues. No servers, complete privacy.">
+    <meta name="keywords" content="payment splitting, split bills, group payments, expense sharing, flutter app, decentralized, open source">
+    <meta name="author" content="Stability Nexus">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://stabilitynexus.github.io/Zplit/">
+    <meta property="og:title" content="Zplit - Split Payments, Not Friendships">
+    <meta property="og:description" content="An open-source, decentralized payment splitting app built with Flutter. Your data stays on your device.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/StabilityNexus/Zplit/main/assets/stability.svg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://stabilitynexus.github.io/Zplit/">
+    <meta property="twitter:title" content="Zplit - Split Payments, Not Friendships">
+    <meta property="twitter:description" content="An open-source, decentralized payment splitting app built with Flutter. Your data stays on your device.">
+    <meta property="twitter:image" content="https://raw.githubusercontent.com/StabilityNexus/Zplit/main/assets/stability.svg">    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #4CAF50;
+            --dark-green: #2E7D32;
+            --light-green: #81C784;
+            --accent-green: #00BFA5;
+            --bg-light: #FAFAFA;
+            --bg-white: #FFFFFF;
+            --text-dark: #212121;
+            --text-gray: #757575;
+            --text-light: #BDBDBD;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: var(--text-dark);
+            background: var(--bg-light);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-green);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            padding: 6rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -150px;
+            left: -150px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;            position: relative;
+            z-index: 1;        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .hero-content .highlight {
+            color: #E8F5E9;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            color: rgba(255,255,255,0.95);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--primary-green);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:hover {
+            background: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Phone Mockup */
+        .phone-mockup {
+            perspective: 1000px;
+        }
+
+        .phone-container {
+            width: 300px;
+            height: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            transform: rotateY(-10deg) rotateX(5deg);
+            transition: all 0.5s ease;
+            animation: phoneFloat 3s ease-in-out infinite;
+        }
+
+        .phone-container:hover {
+            transform: rotateY(0deg) rotateX(0deg) translateY(-10px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes phoneFloat {
+            0%, 100% { transform: rotateY(-10deg) rotateX(5deg) translateY(0); }
+            50% { transform: rotateY(-10deg) rotateX(5deg) translateY(-10px); }
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 28px;
+            background: var(--text-dark);
+            border-radius: 0 0 20px 20px;
+            z-index: 1;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-white);
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .app-header {
+            background: var(--primary-green);
+            color: white;
+            padding: 3rem 1.5rem 1.5rem;
+            text-align: center;
+        }
+
+        .app-header h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .app-header .amount {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .split-list {
+            padding: 1.5rem;
+        }
+
+        .split-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+        }
+
+        .split-item .name {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .split-item .amount-small {
+            color: var(--primary-green);
+            font-weight: 700;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 2rem;
+            background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%);
+            position: relative;
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.25rem;
+            color: var(--text-gray);
+            margin-bottom: 4rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(76, 175, 80, 0.2);
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: var(--primary-green);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .feature-card p {
+            color: var(--text-gray);
+            line-height: 1.8;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 3rem 2rem 2rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--light-green);
+        }
+
+        .footer-social {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: var(--primary-green);
+            transform: translateY(-3px);
+        }
+
+        .footer-copyright {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .share-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal.active {
+            display: flex;
+        }
+
+        .share-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .share-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-gray);
+        }
+
+        .share-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .share-btn {
+            padding: 1rem;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        .share-btn:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-2px);
+        }
+
+        .share-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .kya-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kya-modal.active {
+            display: flex;
+        }
+
+        .kya-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .cta-buttons {
+                justify-content: center;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .phone-container {
+                transform: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="#" class="logo" style="display: flex; align-items: center; gap: 0.5rem;">
+                <img src="../assets/stability.svg" alt="Zplit" style="height: 32px; width: 32px;">
+                <span>Zplit</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#download">Download</a></li>
+                <li><a href="designs.html">Designs</a></li>
+                <li><a href="https://github.com/StabilityNexus/Zplit" target="_blank">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Split Payments, <span class="highlight">Not Friendships</span></h1>
+                <p>An open-source, decentralized payment splitting app built with Flutter. Share expenses seamlessly with friends, roommates, or colleagues.</p>
+                <div class="cta-buttons" id="download">
+                    <a href="#" class="btn btn-primary">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="margin-right: 0.5rem;">
+                            <path d="M17.6 9.48L15.52 7.4L11 11.92V3H9V11.92L4.48 7.4L2.4 9.48L12 19.08L21.6 9.48Z" fill="currentColor"/>
+                            <path d="M21 15V19H3V15H1V19C1 20.1 1.9 21 3 21H21C22.1 21 23 20.1 23 19V15H21Z" fill="currentColor"/>
+                        </svg>
+                        Get on Google Play
+                    </a>
+                    <a href="#" class="btn btn-secondary">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="margin-right: 0.5rem;">
+                            <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09997 22C7.78997 22.05 6.79997 20.68 5.95997 19.47C4.24997 17 2.93997 12.45 4.69997 9.39C5.56997 7.87 7.12997 6.91 8.81997 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" fill="currentColor"/>
+                        </svg>
+                        Download on App Store
+                    </a>
+                </div>
+            </div>
+
+            <!-- Phone Mockup with Animation -->
+            <div class="phone-mockup">
+                <lottie-player
+                    src="https://lottie.host/a8c5e6c3-9e8d-4f0c-b3e9-5e8e8c5e6c3a/RkXp8c5e6c.json"
+                    background="transparent"
+                    speed="1"
+                    style="width: 100px; height: 100px; position: absolute; top: -50px; right: -50px; z-index: 10;"
+                    loop
+                    autoplay
+                    onerror="this.style.display='none'"
+                ></lottie-player>
+                <div class="phone-container">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="app-header">
+                            <h2>Dinner Bill</h2>
+                            <div class="amount">$120.00</div>
+                        </div>
+                        <div class="split-list">
+                            <div class="split-item">
+                                <div class="name">Alice</div>
+                                <div class="amount-small">$30.00</div>
+                            </div>
+                            <div class="split-item">
+                                <div class="name">Bob</div>
+                                <div class="amount-small">$30.00</div>
+                            </div>
+                            <div class="split-item">
+                                <div class="name">Charlie</div>
+                                <div class="amount-small">$30.00</div>
+                            </div>
+                            <div class="split-item">
+                                <div class="name">David</div>
+                                <div class="amount-small">$30.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="features-container">
+            <h2 class="section-title">Built for Everyone</h2>
+            <p class="section-subtitle">Seamless expense sharing powered by Flutter's cross-platform technology</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="white">
+                            <path d="M4 6H2V20C2 21.1 2.9 22 4 22H18V20H4V6ZM20 2H8C6.9 2 6 2.9 6 4V16C6 17.1 6.9 18 8 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H8V4H20V16ZM13.51 10.16C13.92 9.75 14.58 9.75 14.99 10.16L16.34 11.51C16.75 11.92 16.75 12.58 16.34 12.99L11 18.33L9.66 17C9.25 16.59 9.25 15.93 9.66 15.52L13.51 10.16Z"/>
+                        </svg>
+                    </div>
+                    <h3>Cross-Platform</h3>
+                    <p>Built with Flutter for seamless experience on iOS, Android, and Web. One codebase, everywhere.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="white">
+                            <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM10 17L6 13L7.41 11.59L10 14.17L16.59 7.58L18 9L10 17Z"/>
+                        </svg>
+                    </div>
+                    <h3>Secure & Private</h3>
+                    <p>Decentralized architecture ensures your financial data stays private and secure.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="white">
+                            <path d="M13 3C8.03 3 4 7.03 4 12H1L4.89 15.89L4.96 16.03L9 12H6C6 8.13 9.13 5 13 5C16.87 5 20 8.13 20 12C20 15.87 16.87 19 13 19C11.07 19 9.32 18.21 8.06 16.94L6.64 18.36C8.27 19.99 10.51 21 13 21C17.97 21 22 16.97 22 12C22 7.03 17.97 3 13 3ZM12 8V13L16.28 15.54L17 14.33L13.5 12.25V8H12Z"/>
+                        </svg>
+                    </div>
+                    <h3>Instant Settlement</h3>
+                    <p>Split bills and settle payments instantly with real-time synchronization.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="white">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z"/>
+                        </svg>
+                    </div>
+                    <h3>Open Source</h3>
+                    <p>Fully transparent and community-driven. Contribute and customize to your needs.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="white">
+                            <path d="M16 11C17.66 11 18.99 9.66 18.99 8C18.99 6.34 17.66 5 16 5C14.34 5 13 6.34 13 8C13 9.66 14.34 11 16 11ZM8 11C9.66 11 10.99 9.66 10.99 8C10.99 6.34 9.66 5 8 5C6.34 5 5 6.34 5 8C5 9.66 6.34 11 8 11ZM8 13C5.67 13 1 14.17 1 16.5V19H15V16.5C15 14.17 10.33 13 8 13ZM16 13C15.71 13 15.38 13.02 15.03 13.05C16.19 13.89 17 15.02 17 16.5V19H23V16.5C23 14.17 18.33 13 16 13Z"/>
+                        </svg>
+                    </div>
+                    <h3>Group Friendly</h3>
+                    <p>Manage multiple groups and events with ease. Perfect for roommates and travel buddies.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="white">
+                            <path d="M20 4H4C2.9 4 2.01 4.9 2.01 6L2 18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 18H4V12H20V18ZM20 8H4V6H20V8Z"/>
+                        </svg>
+                    </div>
+                    <h3>Smart Tracking</h3>
+                    <p>Automatically track who owes what with intelligent expense categorization.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="designs.html">Design Showcase</a>
+                <a href="https://github.com/StabilityNexus/Zplit" target="_blank">GitHub</a>
+                <a href="https://t.me/StabilityNexus" target="_blank">Telegram</a>
+                <a href="https://discord.gg/YzDKeEfWtS" target="_blank">Discord</a>
+                <a href="https://news.stability.nexus/" target="_blank">Blog</a>
+                <a href="https://linkedin.com/company/stability-nexus" target="_blank">LinkedIn</a>
+                <a href="#" onclick="openKYA(); return false;">KYA</a>
+                <a href="LICENSE.md" target="_blank">License</a>
+                <a href="#" onclick="openShare(); return false;">Share</a>
+            </div>
+            
+            <div class="footer-social">
+                <a href="https://x.com/StabilityNexus" class="social-link" target="_blank" aria-label="X">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </a>
+                <a href="https://github.com/StabilityNexus" class="social-link" target="_blank" aria-label="GitHub">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+                    </svg>
+                </a>
+                <a href="https://www.youtube.com/@StabilityNexus" class="social-link" target="_blank" aria-label="YouTube">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="footer-copyright">
+                <img src="../assets/stability.svg" alt="The Stable Order" style="height: 40px; width: 40px; margin: 0 auto 1rem;">
+                <p><strong>© 2025 The Stable Order</strong></p>
+                <p style="margin-top: 0.5rem;">Zplit - An Open-Source Decentralized Payment Splitting App</p>
+                <p style="margin-top: 0.5rem;">Licensed under <a href="LICENSE.md" style="color: var(--light-green); text-decoration: underline;">GPL v3</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Share Modal -->
+    <div class="share-modal" id="shareModal">
+        <div class="share-content">
+            <button class="share-close" onclick="closeShare()">&times;</button>
+            <h2 style="margin-bottom: 1rem;">Share Zplit</h2>
+            <p style="color: var(--text-gray); margin-bottom: 1.5rem;">Help spread the word about Zplit!</p>
+            <div class="share-buttons">
+                <a href="https://twitter.com/intent/tweet?text=Check%20out%20Zplit%20-%20An%20open-source%20decentralized%20payment%20splitting%20app!%20%40StabilityNexus&url=https://stabilitynexus.github.io/Zplit/" target="_blank" class="share-btn">
+                    <div class="share-icon">𝕏</div>
+                    <div>Twitter</div>
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=https://stabilitynexus.github.io/Zplit/" target="_blank" class="share-btn">
+                    <div class="share-icon">📘</div>
+                    <div>Facebook</div>
+                </a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://stabilitynexus.github.io/Zplit/" target="_blank" class="share-btn">
+                    <div class="share-icon">💼</div>
+                    <div>LinkedIn</div>
+                </a>
+                <a href="https://t.me/share/url?url=https://stabilitynexus.github.io/Zplit/&text=Check%20out%20Zplit%20by%20@StabilityNexus" target="_blank" class="share-btn">
+                    <div class="share-icon">✈️</div>
+                    <div>Telegram</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- KYA Modal -->
+    <div class="kya-modal" id="kyaModal">
+        <div class="kya-content">
+            <button class="share-close" onclick="closeKYA()">&times;</button>
+            <h2 style="margin-bottom: 1rem;">KYA - Know Your Assumptions</h2>
+            <div style="color: var(--text-dark); line-height: 1.8;">
+                <p style="margin-bottom: 1rem;"><strong>What is KYA?</strong></p>
+                <p style="margin-bottom: 1rem;">KYA (Know Your Assumptions) is The Stable Order's commitment to transparency and user safety. We believe users should understand the assumptions, limitations, and risks of the tools they use.</p>
+                
+                <p style="margin-bottom: 1rem;"><strong>Zplit Assumptions:</strong></p>
+                <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                    <li>Your device is secure and not compromised</li>
+                    <li>P2P connections (WiFi Direct, Bluetooth, NFC) are available</li>
+                    <li>Users manually verify shared data accuracy</li>
+                    <li>No central server means no remote backup</li>
+                    <li>Local data can be lost if device is lost/damaged</li>
+                </ul>
+
+                <p style="margin-bottom: 1rem;"><strong>Privacy & Security:</strong></p>
+                <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                    <li>All data is stored locally on your device</li>
+                    <li>No personal data is collected or transmitted to servers</li>
+                    <li>P2P communication is encrypted during transfer</li>
+                    <li>You are responsible for backing up your data</li>
+                </ul>
+
+                <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-gray);">
+                    For more information, visit our <a href="https://github.com/StabilityNexus/Zplit" target="_blank" style="color: var(--primary-green);">GitHub repository</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openShare() {
+            document.getElementById('shareModal').classList.add('active');
+        }
+
+        function closeShare() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+
+        function openKYA() {
+            document.getElementById('kyaModal').classList.add('active');
+        }
+
+        function closeKYA() {
+            document.getElementById('kyaModal').classList.remove('active');
+        }
+
+        // Close modals on outside click
+        document.getElementById('shareModal').addEventListener('click', function(e) {
+            if (e.target === this) closeShare();
+        });
+
+        document.getElementById('kyaModal').addEventListener('click', function(e) {
+            if (e.target === this) closeKYA();
+        });
+    </script>
+</body>
+</html>

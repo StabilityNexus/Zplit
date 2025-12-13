@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="../assets/stability.svg">
+    <title>Zplit - Design Showcase</title>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #4CAF50;
+            --dark-green: #2E7D32;
+            --light-green: #81C784;
+            --bg-light: #FFFFFF;
+            --bg-white: #FFFFFF;
+            --text-dark: #212121;
+            --text-gray: #666666;
+            --card-bg: #FAFAFA;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -200px;
+            right: -200px;
+            animation: float 8s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-30px) translateX(-30px); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-green);
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-gray);
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 0.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .theme-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--primary-green);
+            background: white;
+            color: var(--primary-green);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .theme-btn.active {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .screens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        .screen-card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .screen-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 48px rgba(76, 175, 80, 0.15);
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+
+        .screen-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .screen-description {
+            color: var(--text-gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .phone-frame {
+            width: 100%;
+            max-width: 320px;
+            height: 640px;
+            margin: 0 auto;
+            background: rgba(26, 26, 26, 0.8);
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            animation: phoneFloat 3s ease-in-out infinite;
+        }
+
+        .phone-frame:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes phoneFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 28px;
+            background: #1a1a1a;
+            border-radius: 0 0 20px 20px;
+            z-index: 1;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #FFFFFF;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Onboarding Styles */
+        .onboarding-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .onboarding-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .onboarding-icon svg {
+            width: 50px;
+            height: 50px;
+            fill: var(--primary-green);
+        }
+
+        .onboarding-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .onboarding-text {
+            color: var(--text-gray);
+            margin-bottom: 2rem;
+        }
+
+        .dots {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #ddd;
+            border-radius: 50%;
+        }
+
+        .dot.active {
+            width: 24px;
+            border-radius: 4px;
+            background: var(--primary-green);
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* Account Setup Styles */
+        .account-screen {
+            padding: 2rem;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .profile-circle {
+            width: 100px;
+            height: 100px;
+            background: rgba(76, 175, 80, 0.1);
+            border: 3px solid var(--primary-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem auto;
+            position: relative;
+        }
+
+        .profile-circle svg {
+            width: 50px;
+            height: 50px;
+            fill: var(--primary-green);
+        }
+
+        .camera-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--primary-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .camera-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .info-card {
+            background: rgba(76, 175, 80, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-green);
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        /* Groups Screen Styles */
+        .groups-screen {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-header {
+            padding: 1rem;
+            background: white;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .groups-list {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .group-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .group-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .group-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--primary-green);
+        }
+
+        .group-info {
+            flex: 1;
+        }
+
+        .group-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .group-members {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+        }
+
+        .group-amount {
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .fab {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--primary-green);
+            color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+        }
+
+        .fab svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background: #121212;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .screen-card {
+            background: #1e1e1e;
+        }
+
+        body.dark-mode .phone-screen {
+            background: #1a1a1a;
+        }
+
+        body:not(.dark-mode) .phone-screen {
+            background: #FFFFFF;
+        }
+
+        body:not(.dark-mode) .screen-card {
+            background: #FAFAFA;
+        }
+
+        body.dark-mode .app-header {
+            background: #1e1e1e;
+            border-bottom-color: #333;
+        }
+
+        body.dark-mode .group-card {
+            background: #1e1e1e;
+        }
+
+        body.dark-mode .form-input {
+            background: #1e1e1e;
+            border-color: #333;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .theme-toggle {
+            background: #1e1e1e;
+        }
+
+        body.dark-mode .theme-btn {
+            background: #1e1e1e;
+            color: var(--primary-green);
+        }
+
+        body.dark-mode .theme-btn.active {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        body.dark-mode .screen-title,
+        body.dark-mode .onboarding-title,
+        body.dark-mode .group-name,
+        body.dark-mode .form-label {
+            color: #e0e0e0;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 3rem 2rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--light-green);
+        }
+
+        .footer-social {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: var(--primary-green);
+            transform: translateY(-3px);
+        }
+
+        .footer-copyright {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Share Modal */
+        .share-modal,
+        .kya-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal.active,
+        .kya-modal.active {
+            display: flex;
+        }
+
+        .share-content,
+        .kya-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        body.dark-mode .share-content,
+        body.dark-mode .kya-content {
+            background: rgba(30, 30, 30, 0.95);
+            color: #e0e0e0;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .share-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--text-gray);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .share-close:hover {
+            color: var(--primary-green);
+        }
+
+        .share-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .share-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem 1rem;
+            background: rgba(250, 250, 250, 0.8);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        body.dark-mode .share-btn {
+            background: rgba(42, 42, 42, 0.8);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .share-btn:hover {
+            background: var(--primary-green);
+            color: white;
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 8px 24px rgba(76, 175, 80, 0.4);
+        }
+
+        .share-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle">
+        <button class="theme-btn active" onclick="setTheme('light')">Light</button>
+        <button class="theme-btn" onclick="setTheme('dark')">Dark</button>
+    </div>
+
+    <div class="container">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem;">
+            <img src="../assets/stability.svg" alt="Zplit Logo" style="height: 60px; width: 60px;">
+            <h1 style="margin: 0;">Zplit Design Showcase</h1>
+        </div>
+        <p class="subtitle">Minimal, Clean, Sleek UI Design - Theme 1</p>
+
+        <div class="screens-grid">
+            <!-- Onboarding Screen -->
+            <div class="screen-card">
+                <h3 class="screen-title">Onboarding</h3>
+                <p class="screen-description">Intro screens showcasing Zplit's features</p>
+                <div class="phone-frame">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="onboarding-content">
+                            <div class="onboarding-icon">
+                                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                            </div>
+                            <h2 class="onboarding-title">Split Expenses Effortlessly</h2>
+                            <p class="onboarding-text">Create groups and manage shared expenses with friends, roommates, or colleagues.</p>
+                            <div class="dots">
+                                <div class="dot active"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                            <button class="btn-primary">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Setup Screen -->
+            <div class="screen-card">
+                <h3 class="screen-title">Account Setup</h3>
+                <p class="screen-description">Local account creation (decentralized)</p>
+                <div class="phone-frame">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="account-screen" id="account-form">
+                            <div class="profile-circle">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                <div class="camera-btn">
+                                    <svg viewBox="0 0 24 24"><path d="M12 15c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm0-8c2.76 0 5 2.24 5 5s-2.24 5-5 5-5-2.24-5-5 2.24-5 5-5zm0-3c-4.42 0-8 3.58-8 8 0 1.95.7 3.73 1.87 5.13L2 21l3.87-3.87C7.27 18.3 9.05 19 11 19h2c4.42 0 8-3.58 8-8s-3.58-8-8-8z"/></svg>
+                                </div>
+                            </div>
+                            <h2 style="text-align: center; font-size: 1.25rem; margin-bottom: 0.5rem;">Create Account</h2>
+                            <p style="text-align: center; color: var(--text-gray); font-size: 0.85rem; margin-bottom: 1.5rem;">Your data stays on your device</p>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                <input type="text" id="account-username" class="form-input" placeholder="Enter username">
+                                <div id="username-error" style="color: #f44336; font-size: 0.75rem; margin-top: 0.25rem; display: none;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Display Name</label>
+                                <input type="text" id="account-displayname" class="form-input" placeholder="Enter display name">
+                                <div id="displayname-error" style="color: #f44336; font-size: 0.75rem; margin-top: 0.25rem; display: none;"></div>
+                            </div>
+                            <div id="account-success" style="background: rgba(76, 175, 80, 0.1); padding: 0.75rem; border-radius: 8px; border-left: 3px solid var(--primary-green); margin-bottom: 1rem; font-size: 0.85rem; display: none;">
+                                ✓ Account created successfully!
+                            </div>
+                            <button class="btn-primary" onclick="createAccount()" style="margin-top: 1rem;">Create Account</button>
+                            <div id="saved-account-info"></div>
+                            <div class="info-card">
+                                🔒 Zplit is decentralized. No servers, no sign-up required.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groups Screen -->
+            <div class="screen-card">
+                <h3 class="screen-title">Groups Page</h3>
+                <p class="screen-description">Create and manage expense groups</p>
+                <div class="phone-frame">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="groups-screen">
+                            <div class="app-header">
+                                <h2>Zplit</h2>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--text-dark)">
+                                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                                </svg>
+                            </div>
+                            <div class="groups-list">
+                                <div class="group-card">
+                                    <div class="group-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                                    </div>
+                                    <div class="group-info">
+                                        <div class="group-name">Roommates</div>
+                                        <div class="group-members">4 members</div>
+                                    </div>
+                                    <div class="group-amount">$1,250</div>
+                                </div>
+                                <div class="group-card">
+                                    <div class="group-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M2.5 19h19v2h-19zm19.57-9.36c-.21-.8-1.04-1.28-1.84-1.06L14.92 10l-6.9-6.43-1.93.51 4.14 7.17-4.97 1.33-1.97-1.54-1.45.39 2.59 4.49c.21.36.62.58 1.05.58.16 0 .32-.04.48-.11l13.05-4.58c.39-.14.67-.46.79-.84z"/></svg>
+                                    </div>
+                                    <div class="group-info">
+                                        <div class="group-name">Weekend Trip</div>
+                                        <div class="group-members">6 members</div>
+                                    </div>
+                                    <div class="group-amount">$3,420</div>
+                                </div>
+                                <div class="group-card">
+                                    <div class="group-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg>
+                                    </div>
+                                    <div class="group-info">
+                                        <div class="group-name">Office Lunch</div>
+                                        <div class="group-members">8 members</div>
+                                    </div>
+                                    <div class="group-amount">$856</div>
+                                </div>
+                            </div>
+                            <div class="fab">
+                                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Expense Screen -->
+            <div class="screen-card">
+                <h3 class="screen-title">Add Expense</h3>
+                <p class="screen-description">Simple interface for logging expenses</p>
+                <div class="phone-frame">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="account-screen" id="expense-screen">
+                            <h2 style="text-align: center; font-size: 1.25rem; margin-bottom: 2rem;">New Expense</h2>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Amount</label>
+                                <input type="number" id="expense-amount" class="form-input" placeholder="0.00" value="120" style="font-size: 1.5rem; text-align: center;">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <input type="text" id="expense-desc" class="form-input" placeholder="Dinner at restaurant" value="Dinner at restaurant">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Number of People</label>
+                                <input type="number" id="expense-people" class="form-input" value="4" min="2" max="10">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Split Method</label>
+                                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <button id="split-equal" class="btn-primary" onclick="setSplitMethod('equal')" style="flex: 1; background: var(--primary-green);">Equal</button>
+                                    <button id="split-custom" class="btn-primary" onclick="setSplitMethod('custom')" style="flex: 1; background: white; color: var(--text-dark); border: 1px solid #ddd;">Custom</button>
+                                    <button id="split-percent" class="btn-primary" onclick="setSplitMethod('percent')" style="flex: 1; background: white; color: var(--text-dark); border: 1px solid #ddd;">%</button>
+                                </div>
+                            </div>
+                            <div id="split-result" class="info-card" style="margin-top: 1rem; background: rgba(76, 175, 80, 0.1); border-color: var(--primary-green);">
+                                💰 Each person pays: <strong>$30.00</strong>
+                            </div>
+                            <button class="btn-primary" onclick="calculateSplit()" style="margin-top: 1rem;">Calculate Split</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphs/Analytics Screen -->
+            <div class="screen-card">
+                <h3 class="screen-title">Analytics</h3>
+                <p class="screen-description">Visualizations for expenditure tracking</p>
+                <div class="phone-frame">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="groups-screen">
+                            <div class="app-header">
+                                <h2>Analytics</h2>
+                            </div>
+                            <div class="groups-list">
+                                <div style="background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                                    <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-gray);">Total Expenses</h3>
+                                    <div style="font-size: 2rem; font-weight: 700; color: var(--primary-green);">$5,526.75</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-gray); margin-top: 0.5rem;">This month</div>
+                                </div>
+                                <div style="background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                                    <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-gray);">Category Breakdown</h3>
+                                    <div style="margin-bottom: 0.75rem;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                            <span style="font-size: 0.85rem;">Food & Dining</span>
+                                            <span style="font-weight: 600;">42%</span>
+                                        </div>
+                                        <div style="height: 8px; background: #eee; border-radius: 4px; overflow: hidden;">
+                                            <div style="width: 42%; height: 100%; background: var(--primary-green);"></div>
+                                        </div>
+                                    </div>
+                                    <div style="margin-bottom: 0.75rem;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                            <span style="font-size: 0.85rem;">Transportation</span>
+                                            <span style="font-weight: 600;">28%</span>
+                                        </div>
+                                        <div style="height: 8px; background: #eee; border-radius: 4px; overflow: hidden;">
+                                            <div style="width: 28%; height: 100%; background: #81C784;"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                            <span style="font-size: 0.85rem;">Entertainment</span>
+                                            <span style="font-weight: 600;">30%</span>
+                                        </div>
+                                        <div style="height: 8px; background: #eee; border-radius: 4px; overflow: hidden;">
+                                            <div style="width: 30%; height: 100%; background: #00BFA5;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invite Users Screen -->
+            <div class="screen-card">
+                <h3 class="screen-title">Invite Users</h3>
+                <p class="screen-description">P2P invitation methods (WiFi, Bluetooth, NFC, QR)</p>
+                <div class="phone-frame">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="account-screen">
+                            <h2 style="text-align: center; font-size: 1.25rem; margin-bottom: 1rem;">Invite to Group</h2>
+                            <p style="text-align: center; color: var(--text-gray); font-size: 0.85rem; margin-bottom: 2rem;">Roommates</p>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                                <div style="background: white; padding: 1.5rem; border-radius: 12px; text-align: center; cursor: pointer;">
+                                    <div style="width: 48px; height: 48px; background: rgba(76, 175, 80, 0.1); border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--primary-green)"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+                                    </div>
+                                    <div style="font-size: 0.85rem; font-weight: 600;">WiFi Direct</div>
+                                </div>
+                                <div style="background: white; padding: 1.5rem; border-radius: 12px; text-align: center; cursor: pointer;">
+                                    <div style="width: 48px; height: 48px; background: rgba(76, 175, 80, 0.1); border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--primary-green)"><path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z"/></svg>
+                                    </div>
+                                    <div style="font-size: 0.85rem; font-weight: 600;">Bluetooth</div>
+                                </div>
+                                <div style="background: white; padding: 1.5rem; border-radius: 12px; text-align: center; cursor: pointer;">
+                                    <div style="width: 48px; height: 48px; background: rgba(76, 175, 80, 0.1); border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--primary-green)"><path d="M4 6h18V4H4c-1.1 0-2 .9-2 2v11H0v3h14v-3H4V6zm19 2h-6c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zm-1 9h-4v-7h4v7z"/></svg>
+                                    </div>
+                                    <div style="font-size: 0.85rem; font-weight: 600;">NFC Tap</div>
+                                </div>
+                                <div style="background: white; padding: 1.5rem; border-radius: 12px; text-align: center; cursor: pointer;">
+                                    <div style="width: 48px; height: 48px; background: rgba(76, 175, 80, 0.1); border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--primary-green)"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM18 13h-2v3h-3v2h3v3h2v-3h3v-2h-3z"/></svg>
+                                    </div>
+                                    <div style="font-size: 0.85rem; font-weight: 600;">QR Code</div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-card">
+                                🔒 All peer-to-peer. No data leaves your device.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; padding: 2rem; color: var(--text-gray);">
+            <p>Design Theme 1: Minimal, Clean, Sleek | Both Light & Dark Modes</p>
+            <p style="margin-top: 0.5rem;"><a href="index.html" style="color: var(--primary-green); text-decoration: none;">← Back to Landing Page</a></p>
+        </div>
+    </div>
+
+    <script>
+        let currentSplitMethod = 'equal';
+
+        function setTheme(theme) {
+            const body = document.body;
+            const buttons = document.querySelectorAll('.theme-btn');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (theme === 'dark') {
+                body.classList.add('dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
+            }
+        }
+
+        function setSplitMethod(method) {
+            currentSplitMethod = method;
+            document.querySelectorAll('#expense-screen button[id^="split-"]').forEach(btn => {
+                btn.style.background = 'white';
+                btn.style.color = 'var(--text-dark)';
+                btn.style.border = '1px solid #ddd';
+            });
+            const activeBtn = document.getElementById('split-' + method);
+            activeBtn.style.background = 'var(--primary-green)';
+            activeBtn.style.color = 'white';
+            activeBtn.style.border = 'none';
+            calculateSplit();
+        }
+
+        function calculateSplit() {
+            const amount = parseFloat(document.getElementById('expense-amount').value) || 0;
+            const people = parseInt(document.getElementById('expense-people').value) || 2;
+            const resultDiv = document.getElementById('split-result');
+            
+            if (amount === 0) {
+                resultDiv.innerHTML = '💰 Enter an amount to split';
+                return;
+            }
+
+            let perPerson = 0;
+            let message = '';
+
+            switch(currentSplitMethod) {
+                case 'equal':
+                    perPerson = amount / people;
+                    message = `💰 Each person pays: <strong>$${perPerson.toFixed(2)}</strong>`;
+                    break;
+                case 'custom':
+                    message = `✏️ Custom split - Assign amounts manually for ${people} people`;
+                    break;
+                case 'percent':
+                    message = `📊 Percentage split - Divide $${amount.toFixed(2)} by percentages`;
+                    break;
+            }
+
+            resultDiv.innerHTML = message;
+        }
+
+        // Account creation with validation
+        function createAccount() {
+            const username = document.getElementById('account-username').value.trim();
+            const displayname = document.getElementById('account-displayname').value.trim();
+            const usernameError = document.getElementById('username-error');
+            const displaynameError = document.getElementById('displayname-error');
+            const successMsg = document.getElementById('account-success');
+            
+            let isValid = true;
+            
+            // Reset errors
+            usernameError.style.display = 'none';
+            displaynameError.style.display = 'none';
+            successMsg.style.display = 'none';
+            
+            // Validate username
+            if (!username) {
+                usernameError.textContent = 'Username is required';
+                usernameError.style.display = 'block';
+                isValid = false;
+            } else if (username.length < 3) {
+                usernameError.textContent = 'Username must be at least 3 characters';
+                usernameError.style.display = 'block';
+                isValid = false;
+            } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                usernameError.textContent = 'Username can only contain letters, numbers, and underscores';
+                usernameError.style.display = 'block';
+                isValid = false;
+            }
+            
+            // Validate display name
+            if (!displayname) {
+                displaynameError.textContent = 'Display name is required';
+                displaynameError.style.display = 'block';
+                isValid = false;
+            }
+            
+            if (isValid) {
+                // Store in localStorage (simulating local storage)
+                localStorage.setItem('zplit_username', username);
+                localStorage.setItem('zplit_displayname', displayname);
+                
+                // Show success with animation
+                successMsg.style.display = 'block';
+                successMsg.style.animation = 'slideInUp 0.5s ease-out';
+                
+                // Clear form
+                document.getElementById('account-username').value = '';
+                document.getElementById('account-displayname').value = '';
+                
+                // Display saved account info
+                const accountInfo = document.getElementById('saved-account-info');
+                if (accountInfo) {
+                    accountInfo.innerHTML = `
+                        <div style="margin-top: 1rem; padding: 1rem; background: rgba(76, 175, 80, 0.1); border-radius: 8px; border-left: 4px solid var(--primary-green);">
+                            <p style="margin: 0; font-weight: 600;">Saved Account:</p>
+                            <p style="margin: 0.5rem 0 0 0;">Username: @${username}</p>
+                            <p style="margin: 0.5rem 0 0 0;">Display Name: ${displayname}</p>
+                        </div>
+                    `;
+                }
+                
+                setTimeout(() => {
+                    successMsg.style.animation = 'fadeOut 0.5s ease-out';
+                    setTimeout(() => {
+                        successMsg.style.display = 'none';
+                    }, 500);
+                }, 3000);
+            }
+        }
+        
+        @keyframes slideInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        // Auto-calculate on input change
+        document.addEventListener('DOMContentLoaded', function() {
+            const amountInput = document.getElementById('expense-amount');
+            const peopleInput = document.getElementById('expense-people');
+            
+            if (amountInput && peopleInput) {
+                amountInput.addEventListener('input', calculateSplit);
+                peopleInput.addEventListener('input', calculateSplit);
+                calculateSplit();
+            }
+        });
+
+        function openShare() {
+            document.getElementById('shareModal').classList.add('active');
+        }
+
+        function closeShare() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+
+        function openKYA() {
+            document.getElementById('kyaModal').classList.add('active');
+        }
+
+        function closeKYA() {
+            document.getElementById('kyaModal').classList.remove('active');
+        }
+
+        // Close modals on outside click
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('shareModal')?.addEventListener('click', function(e) {
+                if (e.target === this) closeShare();
+            });
+
+            document.getElementById('kyaModal')?.addEventListener('click', function(e) {
+                if (e.target === this) closeKYA();
+            });
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="https://github.com/StabilityNexus/Zplit" target="_blank">GitHub</a>
+                <a href="https://t.me/StabilityNexus" target="_blank">Telegram</a>
+                <a href="https://discord.gg/YzDKeEfWtS" target="_blank">Discord</a>
+                <a href="https://news.stability.nexus/" target="_blank">Blog</a>
+                <a href="https://linkedin.com/company/stability-nexus" target="_blank">LinkedIn</a>
+                <a href="#" onclick="openKYA(); return false;">KYA</a>
+                <a href="LICENSE.md" target="_blank">License</a>
+                <a href="#" onclick="openShare(); return false;">Share</a>
+            </div>
+            
+            <div class="footer-social">
+                <a href="https://x.com/StabilityNexus" class="social-link" target="_blank" aria-label="X">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </a>
+                <a href="https://github.com/StabilityNexus" class="social-link" target="_blank" aria-label="GitHub">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+                    </svg>
+                </a>
+                <a href="https://www.youtube.com/@StabilityNexus" class="social-link" target="_blank" aria-label="YouTube">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="footer-copyright">
+                <img src="../assets/stability.svg" alt="The Stable Order" style="height: 40px; width: 40px; margin: 0 auto 1rem;">
+                <p><strong>© 2025 The Stable Order</strong></p>
+                <p style="margin-top: 0.5rem;">Zplit - An Open-Source Decentralized Payment Splitting App</p>
+                <p style="margin-top: 0.5rem;">Licensed under <a href="LICENSE.md" style="color: var(--light-green); text-decoration: underline;">GPL v3</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Share Modal -->
+    <div class="share-modal" id="shareModal">
+        <div class="share-content">
+            <button class="share-close" onclick="closeShare()">&times;</button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-dark);">Share Zplit</h2>
+            <p style="color: var(--text-gray); margin-bottom: 1.5rem;">Help spread the word about Zplit!</p>
+            <div class="share-buttons">
+                <a href="https://twitter.com/intent/tweet?text=Check%20out%20Zplit%20-%20An%20open-source%20decentralized%20payment%20splitting%20app!%20%40StabilityNexus&url=https://stabilitynexus.github.io/Zplit/" target="_blank" class="share-btn">
+                    <div class="share-icon">𝕏</div>
+                    <div>Twitter</div>
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=https://stabilitynexus.github.io/Zplit/" target="_blank" class="share-btn">
+                    <div class="share-icon">📘</div>
+                    <div>Facebook</div>
+                </a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://stabilitynexus.github.io/Zplit/" target="_blank" class="share-btn">
+                    <div class="share-icon">💼</div>
+                    <div>LinkedIn</div>
+                </a>
+                <a href="https://t.me/share/url?url=https://stabilitynexus.github.io/Zplit/&text=Check%20out%20Zplit%20by%20@StabilityNexus" target="_blank" class="share-btn">
+                    <div class="share-icon">✈️</div>
+                    <div>Telegram</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- KYA Modal -->
+    <div class="kya-modal" id="kyaModal">
+        <div class="kya-content">
+            <button class="share-close" onclick="closeKYA()">&times;</button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-dark);">KYA - Know Your Assumptions</h2>
+            <div style="color: var(--text-dark); line-height: 1.8;">
+                <p style="margin-bottom: 1rem;"><strong>What is KYA?</strong></p>
+                <p style="margin-bottom: 1rem;">KYA (Know Your Assumptions) is The Stable Order's commitment to transparency and user safety. We believe users should understand the assumptions, limitations, and risks of the tools they use.</p>
+                
+                <p style="margin-bottom: 1rem;"><strong>Zplit Assumptions:</strong></p>
+                <ul style="margin-left: 1.5rem; margin-bottom: 1rem; list-style: disc;">
+                    <li style="margin-bottom: 0.5rem;">Your device is secure and not compromised</li>
+                    <li style="margin-bottom: 0.5rem;">P2P connections (WiFi Direct, Bluetooth, NFC) are available</li>
+                    <li style="margin-bottom: 0.5rem;">Users manually verify shared data accuracy</li>
+                    <li style="margin-bottom: 0.5rem;">No central server means no remote backup</li>
+                    <li style="margin-bottom: 0.5rem;">Local data can be lost if device is lost/damaged</li>
+                </ul>
+
+                <p style="margin-bottom: 1rem;"><strong>Privacy & Security:</strong></p>
+                <ul style="margin-left: 1.5rem; margin-bottom: 1rem; list-style: disc;">
+                    <li style="margin-bottom: 0.5rem;">All data is stored locally on your device</li>
+                    <li style="margin-bottom: 0.5rem;">No personal data is collected or transmitted to servers</li>
+                    <li style="margin-bottom: 0.5rem;">P2P communication is encrypted during transfer</li>
+                    <li style="margin-bottom: 0.5rem;">You are responsible for backing up your data</li>
+                </ul>
+
+                <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-gray);">
+                    For more information, visit our <a href="https://github.com/StabilityNexus/Zplit" target="_blank" style="color: var(--primary-green);">GitHub repository</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
