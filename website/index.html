@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zplit - Decentralized Expense Splitting</title>
+    <meta name="description" content="Zplit is a privacy-focused, offline-first, decentralized expense splitting app.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="logo">Zplit<span class="dot">.</span></a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#workflow">How it Works</a>
+                <a href="#download" class="btn btn-primary">Download App</a>
+            </div>
+            <button class="menu-toggle" aria-label="Toggle Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container hero-content">
+            <span class="hero-badge">Open Source & Decentralized</span>
+            <h1>Split Expenses,<br><span>Not Relationships.</span></h1>
+            <p>The first privacy-focused, offline-first alternative to expense sharing. No servers, no tracking—just you
+                and your friends syncing directly.</p>
+            <div class="hero-btns">
+                <a href="#download" class="btn btn-primary">
+                    Get Early Access
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <polyline points="19 12 12 19 5 12"></polyline>
+                    </svg>
+                </a>
+                <a href="https://github.com/Jitmisra/Zplit" target="_blank" class="btn btn-secondary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.04-.015-2.04-3.338.72-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.31 24 12c0-6.63-5.37-12-12-12" />
+                    </svg>
+                    View Source
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Zplit?</h2>
+                <p>Designed for absolute privacy and seamless local interaction.</p>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
+                    </div>
+                    <h3>Decentralized Core</h3>
+                    <p>No central servers means no data leaks. Your financial data lives on your device and syncs
+                        directly with trusted peers.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+                            <line x1="12" y1="2" x2="12" y2="12" />
+                        </svg>
+                    </div>
+                    <h3>Offline First</h3>
+                    <p>Designed for the real world. Sync expenses instantly via WiFi Direct, Bluetooth, or NFC—even
+                        without internet.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                        </svg>
+                    </div>
+                    <h3>Total Privacy</h3>
+                    <p>We don't sell your data because we don't have it. Data is end-to-end encrypted and stored
+                        primarily on your device.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                            <polyline points="10 9 9 9 8 9" />
+                        </svg>
+                    </div>
+                    <h3>on-Device OCR</h3>
+                    <p>Scan receipt images instantly. Our lightweight AI models run locally on your phone to parse
+                        totals and dates.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                        </svg>
+                    </div>
+                    <h3>Visual Analytics</h3>
+                    <p>Gain insights into your spending habits with privacy-preserving local charts and graphs built
+                        with FL Chart.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                            <line x1="8" y1="21" x2="16" y2="21" />
+                            <line x1="12" y1="17" x2="12" y2="21" />
+                        </svg>
+                    </div>
+                    <h3>Cross Platform</h3>
+                    <p>Built with Flutter for a seamless experience on both Android and iOS devices, with future web
+                        support.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="workflow" class="workflow">
+        <div class="container">
+            <div class="section-header">
+                <h2>How it Works</h2>
+                <p>No signups, no clouds. Just instant collaboration.</p>
+            </div>
+            <div class="workflow-grid">
+                <div class="workflow-item">
+                    <div class="step-number">1</div>
+                    <h3>Create a Group</h3>
+                    <p>Start a local group for your trip or event. No accounts needed, just a local profile.</p>
+                </div>
+                <div class="workflow-item">
+                    <div class="step-number">2</div>
+                    <h3>Scan & Split</h3>
+                    <p>Snap a photo of the bill. AI extracts the items. You tap to assign costs.</p>
+                </div>
+                <div class="workflow-item">
+                    <div class="step-number">3</div>
+                    <h3>Sync Instantly</h3>
+                    <p>Tap phones (NFC) or scan a QR code to sync the group state with friends nearby.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>Zplit<span class="dot">.</span></h3>
+                    <p>The open-source, decentralized standard for expense sharing.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Project</h4>
+                    <a href="https://github.com/StabilityNexus/Zplit">GitHub Repository</a>
+                    <a href="https://github.com/StabilityNexus/Zplit/issues">Contribute</a>
+                    <a href="#">Documentation</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Community</h4>
+                    <a href="https://discord.gg/YzDKeEfWtS">Discord Server</a>
+                    <a href="https://t.me/StabilityNexus">Telegram Group</a>
+                    <a href="https://x.com/StabilityNexus">Twitter / X</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Stability Nexus. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
