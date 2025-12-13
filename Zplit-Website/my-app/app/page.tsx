@@ -1,26 +1,63 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('p2p');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 20);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Handle mobile menu accessibility
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      // Focus first focusable element when menu opens
+      const firstFocusable = mobileMenuRef.current?.querySelector('a, button') as HTMLElement;
+      firstFocusable?.focus();
+
+      // Handle Escape key to close menu
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setMobileMenuOpen(false);
+          menuButtonRef.current?.focus();
+        }
+      };
+
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    } else if (menuButtonRef.current && document.activeElement !== menuButtonRef.current) {
+      // Return focus to button when menu closes (if not already focused)
+      const wasMenuFocused = mobileMenuRef.current?.contains(document.activeElement);
+      if (wasMenuFocused) {
+        menuButtonRef.current.focus();
+      }
+    }
+  }, [mobileMenuOpen]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
       {/* Enhanced Navigation */}
       <nav className={`fixed top-0 z-50 w-full transition-all duration-300 ${scrolled
-          ? 'border-b border-emerald-100/50 bg-white/90 py-3 shadow-lg shadow-emerald-500/5 backdrop-blur-xl dark:border-emerald-900/30 dark:bg-black/90 dark:shadow-emerald-500/10'
-          : 'border-b border-transparent bg-white/60 py-4 backdrop-blur-md dark:bg-black/60'
+        ? 'border-b border-emerald-100/50 bg-white/90 py-3 shadow-lg shadow-emerald-500/5 backdrop-blur-xl dark:border-emerald-900/30 dark:bg-black/90 dark:shadow-emerald-500/10'
+        : 'border-b border-transparent bg-white/60 py-4 backdrop-blur-md dark:bg-black/60'
         }`}>
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
           {/* Logo */}
@@ -94,7 +131,11 @@ export default function Home() {
 
             {/* Mobile Menu Button */}
             <button
+              ref={menuButtonRef}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
               className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 bg-white/50 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900/50 dark:hover:bg-zinc-800 md:hidden"
             >
               <div className="flex h-5 w-5 flex-col items-center justify-center gap-1">
@@ -107,7 +148,11 @@ export default function Home() {
         </div>
 
         {/* Mobile Menu */}
-        <div className={`overflow-hidden transition-all duration-300 md:hidden ${mobileMenuOpen ? 'max-h-96' : 'max-h-0'}`}>
+        <div
+          id="mobile-menu"
+          ref={mobileMenuRef}
+          className={`overflow-hidden transition-all duration-300 md:hidden ${mobileMenuOpen ? 'max-h-96' : 'max-h-0'}`}
+        >
           <div className="border-t border-emerald-100 bg-white/95 px-6 py-4 backdrop-blur-xl dark:border-emerald-900/30 dark:bg-black/95">
             <div className="flex flex-col gap-2">
               <a
@@ -859,16 +904,32 @@ export default function Home() {
           <p className="mb-8 text-lg text-zinc-600 dark:text-zinc-400">
             Join the waitlist and be among the first to experience truly decentralized expense sharing.
           </p>
-          <div className="mb-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              // TODO: Implement waitlist submission
+              alert('Waitlist feature coming soon! Follow us on GitHub for updates.');
+            }}
+            className="mb-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
+          >
+            <label htmlFor="waitlist-email" className="sr-only">
+              Email address for waitlist
+            </label>
             <input
+              id="waitlist-email"
               type="email"
               placeholder="Enter your email"
+              required
+              aria-label="Email address for waitlist"
               className="w-full rounded-full border-2 border-emerald-200 bg-white px-6 py-3 text-zinc-900 placeholder-zinc-400 focus:border-emerald-500 focus:outline-none dark:border-emerald-800 dark:bg-zinc-900 dark:text-white sm:w-80"
             />
-            <button className="w-full rounded-full bg-emerald-900 px-8 py-3 font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-emerald-800 hover:shadow-xl dark:bg-emerald-600 dark:hover:bg-emerald-500 sm:w-auto">
+            <button
+              type="submit"
+              className="w-full rounded-full bg-emerald-900 px-8 py-3 font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-emerald-800 hover:shadow-xl dark:bg-emerald-600 dark:hover:bg-emerald-500 sm:w-auto"
+            >
               Join Waitlist
             </button>
-          </div>
+          </form>
           <p className="text-sm text-zinc-500 dark:text-zinc-500">
             No spam. We'll only notify you when Zplit launches. Unsubscribe anytime.
           </p>
