@@ -3,9 +3,12 @@ dist/
 build/
 .env
 .env.local
+.env.*.local
 *.log
 .DS_Store
 .vscode/
 .idea/
 frontend/node_modules/
 backend/node_modules/
+backend/.env
+

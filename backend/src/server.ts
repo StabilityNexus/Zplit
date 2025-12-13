@@ -1,14 +1,20 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+
+// Load environment variables FIRST
+dotenv.config();
+
+// Import and validate centralized configuration BEFORE loading routes
+import config from './config';
+
 import authRouter from './routes/auth';
 import adsRouter from './routes/ads';
 import deepLinksRouter from './routes/deeplinks';
 import adminRouter from './routes/admin';
 
-dotenv.config();
 const app = express();
-const port = process.env.PORT || 4000;
+const port = config.server.port;
 
 app.use(cors());
 app.use(express.json());
