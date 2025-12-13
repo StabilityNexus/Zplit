@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  ads       Advertisement[]
+  users     User[]
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      UserRole
+  client    Client?  @relation(fields: [clientId], references: [id])
+  clientId  Int?
+  createdAt DateTime @default(now())
+}
+
+model Advertisement {
+  id         Int      @id @default(autoincrement())
+  ad_name    String
+  target_url String
+  start_date DateTime
+  end_date   DateTime
+  status     AdStatus  @default(ACTIVE)
+  client     Client    @relation(fields: [clientId], references: [id])
+  clientId   Int
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model DeepLinkAsset {
+  id         Int      @id @default(autoincrement())
+  platform   Platform
+  content    Json
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+enum AdStatus {
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum UserRole {
+  ADMIN
+  CLIENT
+}
+
+enum Platform {
+  ANDROID
+  IOS
+}
