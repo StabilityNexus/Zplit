@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.zplit.app",
+      "sha256_cert_fingerprints": [
+        "REPLACE_WITH_YOUR_SHA256_FINGERPRINT"
+      ]
+    }
+  }
+]
+
