@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/colors.dart';
 import '../../controllers/onboarding_controller.dart';
+import '../profile/profile_setup_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -58,7 +59,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     children: [
                       if (_controller.currentPageIndex < _controller.pages.length - 1)
                         TextButton(
-                          onPressed: _controller.skipToLast,
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const ProfileSetupScreen()),
+                            );
+                          },
                           child: const Text(
                             'skip',
                             style: TextStyle(
@@ -214,8 +220,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         child: FloatingActionButton(
                           onPressed: () {
                             _controller.nextPage(() {
-                              debugPrint("Done onboarding — Route trigger goes here");
-                              // Future: Handle route replacement out of Context
+                              debugPrint("Done onboarding — navigating to Profile Setup...");
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => const ProfileSetupScreen()),
+                              );
                             });
                           },
                           backgroundColor: AppColors.primaryGreen,
