@@ -1,0 +1,14 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.example.zplit",
+            "sha256_cert_fingerprints": [
+                "32:DA:ED:8E:C8:68:01:57:5A:A6:D2:8B:40:9F:E9:E5:BC:CB:7B:37:7B:ED:5E:40:07:49:6D:0A:3D:91:9F:1B"
+            ]
+        }
+    }
+]
