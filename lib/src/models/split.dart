@@ -1,6 +1,6 @@
 class Split {
   final String userId;
-  final double amount;
+  final int amount;
 
   Split({
     required this.userId,

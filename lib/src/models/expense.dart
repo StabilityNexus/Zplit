@@ -1,12 +1,13 @@
+import 'dart:collection';
 import 'split.dart';
 
 class Expense {
   final String id;
   final String title;
-  final double amount;
+  final int amount;
   final String payerId;
   final DateTime date;
-  final List<Split> splits;
+  final List<Split> _splits;
 
   Expense({
     required this.id,
@@ -14,8 +15,10 @@ class Expense {
     required this.amount,
     required this.payerId,
     required this.date,
-    required this.splits,
-  });
+    required List<Split> splits,
+  }) : _splits = List.unmodifiable(splits);
+
+  UnmodifiableListView<Split> get splits => UnmodifiableListView(_splits);
 
   @override
   bool operator ==(Object other) =>
@@ -29,6 +32,6 @@ class Expense {
 
   @override
   String toString() {
-    return 'Expense{id: $id, title: $title, amount: $amount, payerId: $payerId, splits: ${splits.length}}';
+    return 'Expense{id: $id, title: $title, amount: $amount, payerId: $payerId, splits: ${_splits.length}}';
   }
 }
