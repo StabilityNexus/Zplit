@@ -23,4 +23,17 @@ void main() {
     expect(payFromU3.toUserId, 'u1');
     expect(payFromU3.amount, 4000);
   });
+
+  test('Throws exception if total balance is not zero', () {
+    Map<String, int> balances = {
+      'u1': 8000,
+      'u2': -4000,
+      'u3': -3000,
+    };
+
+    expect(
+      () => Settlement.calculateSettlement(balances),
+      throwsA(isA<Exception>().having((e) => e.toString(), 'message', contains('total balance must be zero'))),
+    );
+  });
 }

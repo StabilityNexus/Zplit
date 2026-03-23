@@ -30,6 +30,14 @@ class Transaction {
 class Settlement {
   /// Calculates the minimum transactions required to settle all balances.
   static List<Transaction> calculateSettlement(Map<String, int> balances) {
+    int totalBalance = balances.values.fold(0, (sum, val) => sum + val);
+
+    if (totalBalance != 0) {
+      throw Exception(
+        'Invalid state: total balance must be zero before settlement. Got $totalBalance'
+      );
+    }
+
     List<Transaction> transactions = [];
 
     // Separate into debtors (negative balance) and creditors (positive balance)
