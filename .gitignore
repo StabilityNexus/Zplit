@@ -1,7 +1,50 @@
-## Core latex/pdflatex auxiliary files:
-*.aux
-*.lof
+# Miscellaneous
+*.class
 *.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains configure files for the VS Code editor.
+.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Web related
+lib/generated_plugin_registrant.dart
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# macOS
+.DS_Store
 *.lot
 *.fls
 *.out
@@ -11,15 +54,13 @@
 *.cb
 *.cb2
 .*.lb
+*.dart_tool
+build/
+**/build/
 
 ## Intermediate documents:
 *.dvi
-*.xdv
 *-converted-to.*
-# these rules might exclude image files for figures etc.
-# *.ps
-# *.eps
-# *.pdf
 
 ## Generated if empty string is given at "Please type another file name for output:"
 .pdf
@@ -45,8 +86,7 @@
 rubber.cache
 
 ## Build tool directories for auxiliary files
-# latexrun
-latex.out/
+latexrun/
 
 ## Auxiliary and intermediate files from other packages:
 # algorithms
@@ -78,7 +118,7 @@ acs-*.bib
 # cprotect
 *.cpt
 
-# elsarticle (documentclass of Elsevier journals)
+# elsarticle
 *.spl
 
 # endnotes
@@ -94,7 +134,7 @@ acs-*.bib
 *.t[1-9][0-9]
 *.tfm
 
-#(r)(e)ledmac/(r)(e)ledpar
+# (r)(e)ledmac/(r)(e)ledpar
 *.end
 *.?end
 *.[1-9]
@@ -126,9 +166,6 @@ acs-*.bib
 *.slo
 *.sls
 
-# uncomment this for glossaries-extra (will ignore makeindex's style files!)
-# *.ist
-
 # gnuplot
 *.gnuplot
 *.table
@@ -157,12 +194,7 @@ acs-*.bib
 
 # knitr
 *-concordance.tex
-# TODO Uncomment the next line if you use knitr and want to ignore its generated tikz files
-# *.tikz
 *-tikzDictionary
-
-# latexindent will create succesive backup files by default
-#*.bak*
 
 # listings
 *.lol
@@ -319,8 +351,3 @@ TSWLatexianTemp*
 
 # xwatermark package
 *.xwm
-
-# REVTeX puts footnotes in the bibliography by default, unless the nofootinbib
-# option is specified. Footnotes are the stored in a file with suffix Notes.bib.
-# Uncomment the next line to have this generated file ignored.
-#*Notes.bib
