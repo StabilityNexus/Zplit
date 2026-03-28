@@ -5,6 +5,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:zplit/controllers/profile_setup_controller.dart';
 import 'package:zplit/core/constants/colors.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:zplit/views/profile/add_friends_screen.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key});
@@ -289,8 +291,18 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                             height: 52, // Slightly thinner to match native look
                             child: ElevatedButton(
                               onPressed: isValid
-                                  ? () {
-                                      // Submit action
+                                  ? () async {
+                                      // Request OS native contacts permission
+                                      await Permission.contacts.request();
+                                      
+                                      if (context.mounted) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => const AddFriendsScreen(),
+                                          ),
+                                        );
+                                      }
                                     }
                                   : null,
                               style: ElevatedButton.styleFrom(
