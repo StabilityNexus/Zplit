@@ -4,12 +4,11 @@ on:
   pull_request:
     branches:
       - main
-       -dev
+      - dev
   push:
     branches:
       - dev
   workflow_dispatch:
-       
 
 jobs:
   test:
@@ -22,15 +21,14 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0'
+          flutter-version: '3.44.2'
           channel: 'stable'
+
       - name: Clean runner
-        run: flutter clean  
+        run: flutter clean
 
       - name: Install dependencies
         run: flutter pub get
-
-      
 
       - name: Analyze code
         run: flutter analyze
