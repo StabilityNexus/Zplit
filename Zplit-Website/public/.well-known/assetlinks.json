@@ -1,14 +1,13 @@
 [
-    {
-        "relation": [
-            "delegate_permission/common.handle_all_urls"
-        ],
-        "target": {
-            "namespace": "android_app",
-            "package_name": "com.example.zplit",
-            "sha256_cert_fingerprints": [
-                "32:DA:ED:8E:C8:68:01:57:5A:A6:D2:8B:40:9F:E9:E5:BC:CB:7B:37:7B:ED:5E:40:07:49:6D:0A:3D:91:9F:1B"
-            ]
-        }
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "org.aossie.zplit",
+      "sha256_cert_fingerprints": [
+        "31:54:22:A8:C7:BC:F7:D0:8E:EC:A7:BD:8C:70:DF:51:A0:20:D9:49:C7:FD:C8:18:A5:A1:A0:47:FD:04:CF:8D",
+        "E6:78:20:38:D6:0F:6B:3F:38:C5:6D:37:03:C1:20:0B:73:ED:76:25:98:B9:C0:F0:EE:9C:05:D7:06:46:0A:C0"
+      ]
     }
+  }
 ]
