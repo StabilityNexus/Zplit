@@ -11,6 +11,9 @@ import 'package:zplit/ui/bluetooth/view_model/bluetooth_event.dart';
 import 'package:zplit/ui/bluetooth/view_model/bluetooth_state.dart';
 import 'package:zplit/ui/users/view_model/user_bloc.dart';
 import 'package:zplit/ui/users/view_model/user_state.dart';
+import 'package:zplit/ui/nfc/view_model/nfc_bloc.dart';
+import 'package:zplit/ui/nfc/view_model/nfc_event.dart';
+import 'package:zplit/ui/nfc/view_model/nfc_state.dart';
 
 class InviteFriendsScreen extends StatefulWidget {
   final String userId;
@@ -29,15 +32,10 @@ class InviteFriendsScreen extends StatefulWidget {
 
 class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
   bool _proximityEnabled = false;
-  bool _nfcEnabled = false;
   String _proximityFilter = 'Contacts Only';
 
-  // NEW — our own profile picture path, used to attach a thumbnail to the
-  // Bluetooth invite payload so both devices sync pictures on connect.
   String? _myProfilePicturePath;
 
-  // NEW — tracks endpoints we've already auto-sent our profile to, so we
-  // don't resend on every unrelated connectionStatus map change.
   final Set<String> _autoSentTo = {};
 
   @override
@@ -59,9 +57,6 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
   }
 
   String get _inviteDeepLink {
-    // Deep link / QR stays lightweight (no picture) — URL and QR payload
-    // size limits make embedding a base64 image here risky. Picture sync
-    // happens over Bluetooth's _inviteJsonPayload instead.
     final payload = {
       'id': widget.userId,
       'name': widget.name,
@@ -69,14 +64,11 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
       'ts': DateTime.now().millisecondsSinceEpoch ~/ 1000,
     };
     final encoded = base64Url.encode(utf8.encode(jsonEncode(payload)));
-    return 'https://janvi34334-coder.github.io/zplit/invite?d=$encoded';
+    return 'https://zplit.aossie.org/invite?d=$encoded';
   }
 
-  String get _displayLink => 'janvi34334-coder.github.io/zplit/invite';
+  String get _displayLink => 'zplit.aossie.org/invite';
 
-  // CHANGED — now includes a base64-encoded profile picture when available.
-  // Bluetooth payloads aren't size-constrained like QR/deep links, so it's
-  // safe to attach the full picture here.
   String get _inviteJsonPayload {
     String? picBase64;
     final path = _myProfilePicturePath;
@@ -133,7 +125,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
             );
           }
 
-          // NEW — the instant any endpoint becomes connected, automatically
+          // the instant any endpoint becomes connected, automatically
           // send our own profile (name + picture) without waiting for the
           // user to tap "Send". Both devices run this same logic, so a
           // single connection syncs profile pictures in both directions.
@@ -160,18 +152,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
               const SizedBox(height: 24),
               _buildProximitySection(theme),
               const SizedBox(height: 24),
-              _buildToggleSection(
-                theme,
-                title: 'NFC',
-                value: _nfcEnabled,
-                onChanged: (val) => setState(() => _nfcEnabled = val),
-                child: _nfcEnabled
-                    ? _buildNfcContent(theme)
-                    : _buildDisabledHint(
-                        theme,
-                        'Enable NFC to share with nearby devices.',
-                      ),
-              ),
+              _buildNfcSection(theme),
             ],
           ),
         ),
@@ -246,7 +227,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: colors.primary.withOpacity(0.6),
+                    color: colors.primary.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -254,7 +235,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
                   child: Text(
                     'Searching for nearby Zplit users...',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                 ),
@@ -280,9 +261,6 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
     Widget trailing;
     switch (s) {
       case BtConnectionStatus.connected:
-        // CHANGED — profile is already auto-sent on connect (see
-        // BlocListener above). This now just re-sends on demand, e.g. if
-        // the picture changed after connecting.
         trailing = Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -379,7 +357,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
             border: Border.all(color: theme.dividerColor),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(
+                color: Colors.black.withValues(alpha: 
                   theme.brightness == Brightness.dark ? 0.08 : 0.03,
                 ),
                 blurRadius: 16,
@@ -431,7 +409,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
             border: Border.all(color: theme.dividerColor),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(
+                color: Colors.black.withValues(alpha: 
                   theme.brightness == Brightness.dark ? 0.08 : 0.03,
                 ),
                 blurRadius: 16,
@@ -499,7 +477,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
             Switch(
               value: value,
               onChanged: onChanged,
-              activeColor: colors.primary,
+              activeThumbColor: colors.primary,
             ),
           ],
         ),
@@ -513,7 +491,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
             border: Border.all(color: theme.dividerColor),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(
+                color: Colors.black.withValues(alpha: 
                   theme.brightness == Brightness.dark ? 0.08 : 0.03,
                 ),
                 blurRadius: 16,
@@ -562,7 +540,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
                           Icon(
                             Icons.keyboard_arrow_down,
                             size: 16,
-                            color: theme.colorScheme.onSurface.withOpacity(0.5),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                           ),
                         ],
                       ),
@@ -572,7 +550,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
                 Switch(
                   value: _proximityEnabled,
                   onChanged: (val) => setState(() => _proximityEnabled = val),
-                  activeColor: colors.primary,
+                  activeThumbColor: colors.primary,
                 ),
               ],
             ),
@@ -588,7 +566,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
             border: Border.all(color: theme.dividerColor),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(
+                color: Colors.black.withValues(alpha: 
                   theme.brightness == Brightness.dark ? 0.08 : 0.03,
                 ),
                 blurRadius: 16,
@@ -635,7 +613,39 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
     });
   }
 
-  Widget _buildNfcContent(ThemeData theme) {
+  // ── NFC section — now backed by NfcBloc instead of a local bool ──
+
+  Widget _buildNfcSection(ThemeData theme) {
+    return BlocConsumer<NfcBloc, NfcState>(
+      listenWhen: (prev, curr) =>
+          prev.errorMessage != curr.errorMessage && curr.errorMessage != null,
+      listener: (context, state) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(state.errorMessage!),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        context.read<NfcBloc>().add(NfcReset());
+      },
+      builder: (context, nfcState) {
+        return _buildToggleSection(
+          theme,
+          title: 'NFC',
+          value: nfcState.enabled,
+          onChanged: (val) => context.read<NfcBloc>().add(NfcToggled(val)),
+          child: nfcState.enabled
+              ? _buildNfcContent(theme, nfcState)
+              : _buildDisabledHint(
+                  theme,
+                  'Enable NFC to share with nearby devices.',
+                ),
+        );
+      },
+    );
+  }
+
+  Widget _buildNfcContent(ThemeData theme, NfcState nfcState) {
     final colors = theme.colorScheme;
     return Column(
       children: [
@@ -646,14 +656,48 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
             shape: BoxShape.circle,
             color: colors.primary,
           ),
-          child: const Icon(Icons.nfc_rounded, color: Colors.white, size: 44),
+          child: nfcState.isBusy
+              ? const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 3,
+                  ),
+                )
+              : const Icon(Icons.nfc_rounded, color: Colors.white, size: 44),
         ),
         const SizedBox(height: 16),
         Text(
-          'Hold your device near another\nNFC-enabled phone to connect.',
+          nfcState.isBusy
+              ? 'Hold devices together...'
+              : 'Hold your device near another\nNFC-enabled phone to connect.',
           textAlign: TextAlign.center,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: 200,
+          child: ElevatedButton.icon(
+            onPressed: nfcState.isBusy
+                ? null
+                : () {
+                    context.read<NfcBloc>().add(
+                      NfcSendPayload(_inviteJsonPayload),
+                    );
+                  },
+            icon: const Icon(Icons.nfc_rounded, size: 18),
+            label: const Text('Tap to Share Invite'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colors.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              elevation: 0,
+            ),
           ),
         ),
       ],
@@ -666,7 +710,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
         message,
         textAlign: TextAlign.center,
         style: theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.onSurface.withOpacity(0.5),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
         ),
       ),
     );
@@ -684,6 +728,8 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
   }
 
   void _shareLink() {
-    Share.share(_inviteDeepLink, subject: 'Join me on Zplit!');
+    SharePlus.instance.share(
+      ShareParams(text: _inviteDeepLink, subject: 'Join me on Zplit!'),
+    );
   }
 }

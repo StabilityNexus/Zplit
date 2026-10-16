@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:zplit/core/services/bluetooth_service.dart' show BtEndpoint;
 import 'package:zplit/core/services/crypto_service.dart';
 import 'package:zplit/ui/bluetooth/view_model/bluetooth_bloc.dart';
@@ -92,6 +90,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     if (userState is! UserLoaded) return;
 
     const FlutterSecureStorage().read(key: 'evm_address').then((me) {
+      if (!mounted) return;
       final friends = userState.users.where((u) => u.publicKey != me).toList();
 
       if (friends.isEmpty) {
@@ -129,7 +128,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     (f) => ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: CircleAvatar(
-                        backgroundColor: theme.colorScheme.primary.withOpacity(
+                        backgroundColor: theme.colorScheme.primary.withValues(alpha: 
                           0.12,
                         ),
                         child: Text(
@@ -234,6 +233,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         tag: tag,
         timestamp: ts,
       );
+      if (!mounted) return;
 
       context.read<TransactionBloc>().add(
         CreateTransaction(
@@ -280,7 +280,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       }
 
       final encoded = base64Url.encode(utf8.encode(jsonPayload));
-      final link = 'zplit://tx/v1?d=$encoded';
+      final link = 'https://zplit.aossie.org/tx?d=$encoded';
 
       if (!mounted) return;
 
@@ -298,6 +298,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             sentViaBluetooth: sentViaBluetooth,
             bluetoothEndpointId: bluetoothEndpointId,
             bluetoothJsonPayload: sentViaBluetooth ? jsonPayload : null,
+            nfcJsonPayload: jsonPayload,
           ),
         ),
       );
@@ -325,8 +326,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
     return BlocListener<TransactionBloc, TransactionState>(
       listener: (context, state) {
-        if (state is TransactionError)
+        if (state is TransactionError) {
           _showSnack('Transaction error: ${state.message}');
+        }
       },
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
@@ -401,7 +403,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                           style: theme.textTheme.bodyLarge?.copyWith(
                             color: _selectedDate != null
                                 ? theme.colorScheme.onSurface
-                                : theme.colorScheme.onSurface.withOpacity(0.4),
+                                : theme.colorScheme.onSurface.withValues(alpha: 0.4),
                           ),
                         ),
                       ),
@@ -430,7 +432,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     children: [
                       CircleAvatar(
                         radius: 16,
-                        backgroundColor: colors.primary.withOpacity(0.12),
+                        backgroundColor: colors.primary.withValues(alpha: 0.12),
                         child: Icon(
                           Icons.person,
                           color: colors.primary,
@@ -449,12 +451,12 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                         Icon(
                           Icons.arrow_forward,
                           size: 14,
-                          color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
                         const SizedBox(width: 8),
                         CircleAvatar(
                           radius: 16,
-                          backgroundColor: colors.primary.withOpacity(0.12),
+                          backgroundColor: colors.primary.withValues(alpha: 0.12),
                           child: Text(
                             _selectedFriendName![0].toUpperCase(),
                             style: TextStyle(
@@ -505,14 +507,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                               : _selectedSplit,
                           style: theme.textTheme.bodyLarge?.copyWith(
                             color: _selectedSplit.isEmpty
-                                ? theme.colorScheme.onSurface.withOpacity(0.4)
+                                ? theme.colorScheme.onSurface.withValues(alpha: 0.4)
                                 : theme.colorScheme.onSurface,
                           ),
                         ),
                       ),
                       Icon(
                         Icons.keyboard_arrow_down,
-                        color: theme.colorScheme.onSurface.withOpacity(0.5),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         size: 22,
                       ),
                     ],
@@ -567,7 +569,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? colors.primary.withOpacity(0.1)
+                              ? colors.primary.withValues(alpha: 0.1)
                               : Colors.transparent,
                           border: Border.all(
                             color: isSelected
@@ -581,7 +583,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: isSelected
                                 ? colors.primary
-                                : theme.colorScheme.onSurface.withOpacity(0.7),
+                                : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                             fontWeight: isSelected
                                 ? FontWeight.w600
                                 : FontWeight.normal,
@@ -607,7 +609,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     contentPadding: const EdgeInsets.all(16),
                     hintText: 'Optional notes...',
                     hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.3),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                     ),
                   ),
                 ),
@@ -671,7 +673,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: colors.primary.withOpacity(0.06),
+        color: colors.primary.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -695,7 +697,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       text,
       style: theme.textTheme.bodySmall?.copyWith(
         fontWeight: FontWeight.w600,
-        color: theme.colorScheme.onSurface.withOpacity(0.55),
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
         fontSize: 12,
         letterSpacing: 0.3,
       ),
@@ -724,7 +726,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           ),
           hintText: hint,
           hintStyle: theme.textTheme.bodyLarge?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.35),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.35),
           ),
           suffixIcon: suffix != null
               ? Padding(
@@ -745,7 +747,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     return BoxDecoration(
       color: theme.cardColor,
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: theme.dividerColor.withOpacity(0.7)),
+      border: Border.all(color: theme.dividerColor.withValues(alpha: 0.7)),
     );
   }
 
@@ -778,7 +780,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   subtitle: Text(
                     _splitSubtitle(option),
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                   trailing: _selectedSplit == option

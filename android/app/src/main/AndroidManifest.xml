@@ -22,6 +22,9 @@
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="33" />
 
+    
+    <uses-permission android:name="android.permission.NFC" />
+
     <application
         android:label="zplit"
         android:name="${applicationName}"
@@ -40,14 +43,13 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
-              <intent-filter>
+              <intent-filter android:autoVerify="true">
     <action android:name="android.intent.action.VIEW" />
     <category android:name="android.intent.category.DEFAULT" />
     <category android:name="android.intent.category.BROWSABLE" />
        <data
     android:scheme="https"
-    android:host="janvi34334-coder.github.io"
-    android:pathPrefix="/zplit" />
+    android:host="zplit.aossie.org" />
 </intent-filter>
 <intent-filter>
     <action android:name="android.intent.action.VIEW" />

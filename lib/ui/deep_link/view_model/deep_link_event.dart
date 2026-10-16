@@ -23,3 +23,18 @@ class BluetoothTransactionReceived extends DeepLinkEvent {
   final String jsonPayload;
   const BluetoothTransactionReceived(this.jsonPayload);
 }
+
+class NfcInviteReceived extends DeepLinkEvent {
+  final String jsonPayload;
+  const NfcInviteReceived(this.jsonPayload);
+}
+
+class NfcAckReceived extends DeepLinkEvent {
+  final String jsonPayload;
+  const NfcAckReceived(this.jsonPayload);
+}
+
+class NfcTransactionReceived extends DeepLinkEvent {
+  final String jsonPayload;
+  const NfcTransactionReceived(this.jsonPayload);
+}

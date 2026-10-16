@@ -18,12 +18,14 @@ void main() {
         const UsersTableCompanion(
           publicKey: Value('pk_alice'),
           displayName: Value('Alice'),
+          defaultCurrency: Value('USD'),
         ),
       );
       await db.usersDao.upsert(
         const UsersTableCompanion(
           publicKey: Value('pk_bob'),
           displayName: Value('Bob'),
+          defaultCurrency: Value('USD'),
         ),
       );
     });
@@ -42,6 +44,7 @@ void main() {
           fromUserPublicKey: Value('pk_alice'),
           toUserPublicKey: Value('pk_bob'),
           amount: Value(BigInt.from(30)),
+          currency: Value('USD'),
           status: Value(TransactionStatus.unsigned),
         ),
       );
@@ -58,6 +61,7 @@ void main() {
           fromUserPublicKey: Value('pk_alice'),
           toUserPublicKey: Value('pk_bob'),
           amount: Value(BigInt.from(15)),
+          currency: Value('USD'),
           status: Value(TransactionStatus.unsigned),
         ),
       );
@@ -79,6 +83,7 @@ void main() {
           fromUserPublicKey: Value('pk_alice'),
           toUserPublicKey: Value('pk_bob'),
           amount: Value(BigInt.from(15)),
+          currency: Value('USD'),
           status: Value(TransactionStatus.unsigned),
         ),
       );
@@ -88,6 +93,7 @@ void main() {
           fromUserPublicKey: Value('pk_bob'),
           toUserPublicKey: Value('pk_alice'),
           amount: Value(BigInt.from(15)),
+          currency: Value('USD'),
           status: Value(TransactionStatus.signed),
         ),
       );
@@ -103,6 +109,7 @@ void main() {
           fromUserPublicKey: Value('pk_alice'),
           toUserPublicKey: Value('pk_bob'),
           amount: Value(BigInt.from(15)),
+          currency: Value('USD'),
           status: Value(TransactionStatus.partiallySigned),
         ),
       );

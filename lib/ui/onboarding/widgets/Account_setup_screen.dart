@@ -59,7 +59,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
   void _onContinue() async {
     if (!_isValid) return;
     final address = await const FlutterSecureStorage().read(key: 'evm_address');
-    if (address == null) return;
+    if (address == null || !mounted) return;
 
     context.read<UserBloc>().add(
       UpsertUser(
