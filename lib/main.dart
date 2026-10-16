@@ -16,30 +16,35 @@ import 'package:zplit/ui/deep_link/view_model/deep_link_bloc.dart';
 import 'package:zplit/ui/transaction/view_model/transaction_bloc.dart';
 import 'package:zplit/ui/users/view_model/user_bloc.dart';
 import 'package:zplit/core/theme/app_theme.dart';
+import 'package:zplit/ui/nfc/view_model/nfc_bloc.dart';
+import 'package:zplit/ui/nfc/nfc_link_bridge.dart';
+import 'package:zplit/ui/wifi/view_model/Wifi_direct_bloc.dart';
+
+import 'package:zplit/ui/wifi/wifi_link_bridge.dart';
 
 class AppBlocObserver extends BlocObserver {
   @override
   void onCreate(BlocBase bloc) {
     super.onCreate(bloc);
-    print('onCreate -- ${bloc.runtimeType}');
+    debugPrint('onCreate -- ${bloc.runtimeType}');
   }
 
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
-    print('onChange -- ${bloc.runtimeType}, $change');
+    debugPrint('onChange -- ${bloc.runtimeType}, $change');
   }
 
   @override
   void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
     super.onError(bloc, error, stackTrace);
-    print('onError -- ${bloc.runtimeType}, $error');
+    debugPrint('onError -- ${bloc.runtimeType}, $error');
   }
 
   @override
   void onClose(BlocBase bloc) {
     super.onClose(bloc);
-    print('onClose -- ${bloc.runtimeType}');
+    debugPrint('onClose -- ${bloc.runtimeType}');
   }
 }
 
@@ -87,6 +92,8 @@ class MyApp extends StatelessWidget {
           ),
         ),
         BlocProvider(create: (_) => BluetoothBloc()),
+        BlocProvider(create: (_) => NfcBloc()),
+        BlocProvider(create: (_) => WifiBloc()),
       ],
       child: MaterialApp(
         title: 'Zplit',
@@ -98,7 +105,11 @@ class MyApp extends StatelessWidget {
         onGenerateRoute: AppRouter.onGenerateRoute,
         initialRoute: AppRoutes.splash,
         builder: (context, child) {
-          return AppLinkListener(child: BluetoothLinkBridge(child: child!));
+          return AppLinkListener(
+            child: BluetoothLinkBridge(
+              child: NfcLinkBridge(child: WifiLinkBridge(child: child!)),
+            ),
+          );
         },
       ),
     );

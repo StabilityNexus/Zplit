@@ -1,11 +1,11 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:zplit/features/group/domain/models/group_model.dart';
-import 'package:zplit/features/group/domain/repositories/group_repository.dart';
-import 'package:zplit/features/group/presentation/group_bloc.dart';
-import 'package:zplit/features/group/presentation/group_event.dart';
-import 'package:zplit/features/group/presentation/group_state.dart';
+import 'package:zplit/domain/models/group/group_model.dart';
+import 'package:zplit/domain/repositories/group/group_repository.dart';
+import 'package:zplit/ui/group/view_model/group_bloc.dart';
+import 'package:zplit/ui/group/view_model/group_event.dart';
+import 'package:zplit/ui/group/view_model/group_state.dart';
 
 class MockGroupRepository extends Mock implements GroupRepository {}
 

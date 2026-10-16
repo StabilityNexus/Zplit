@@ -17,6 +17,7 @@ void main() {
         const UsersTableCompanion(
           publicKey: Value('pk_alice'),
           displayName: Value('Alice'),
+          defaultCurrency: Value('USD'),
         ),
       );
     });
@@ -33,6 +34,7 @@ void main() {
         const BalancesTableCompanion(
           userPublicKey: Value('pk_alice'),
           netAmount: Value(100),
+          currency: Value('USD'),
         ),
       );
 
@@ -46,6 +48,7 @@ void main() {
         const BalancesTableCompanion(
           userPublicKey: Value('pk_alice'),
           netAmount: Value(50),
+          currency: Value('USD'),
         ),
       );
 
@@ -64,12 +67,14 @@ void main() {
         const BalancesTableCompanion(
           userPublicKey: Value('pk_alice'),
           netAmount: Value(100),
+          currency: Value('USD'),
         ),
       );
       await dao.upsert(
         const BalancesTableCompanion(
           userPublicKey: Value('pk_alice'),
           netAmount: Value(200),
+          currency: Value('USD'),
         ),
       );
 
@@ -82,6 +87,7 @@ void main() {
         const BalancesTableCompanion(
           userPublicKey: Value('pk_alice'),
           netAmount: Value(100),
+          currency: Value('USD'),
         ),
       );
 

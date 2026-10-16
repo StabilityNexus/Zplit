@@ -109,9 +109,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   CircleAvatar(
                     radius: 52,
-                    backgroundColor: colors.primary.withOpacity(0.12),
+                    backgroundColor: colors.primary.withValues(alpha: 0.12),
                     backgroundImage: hasImage
-                        ? FileImage(File(me!.profilePicture!))
+                        ? FileImage(File(me.profilePicture!))
                         : null,
                     child: !hasImage
                         ? Icon(Icons.person, size: 52, color: colors.primary)
@@ -131,7 +131,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ? '${_address!.substring(0, 6)}...${_address!.substring(_address!.length - 4)}'
                         : '',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.45),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
                     ),
                   ),
                 ],
@@ -153,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 trailing: Text(
                   'Light',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
                 onTap: () {},
@@ -222,7 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.dividerColor.withOpacity(0.5)),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.5)),
       ),
       child: Column(children: children),
     );
@@ -247,7 +247,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Icon(
                   Icons.chevron_right,
                   size: 20,
-                  color: theme.colorScheme.onSurface.withOpacity(0.4),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                 ),
           ],
         ),
@@ -260,7 +260,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       height: 1,
       indent: 16,
       endIndent: 16,
-      color: theme.dividerColor.withOpacity(0.5),
+      color: theme.dividerColor.withValues(alpha: 0.5),
     );
   }
 }

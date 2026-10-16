@@ -5,6 +5,7 @@ import 'package:zplit/domain/models/user/user_model.dart';
 import 'package:zplit/ui/onboarding/widgets/Account_setup_screen.dart';
 import 'package:zplit/ui/onboarding/widgets/Onboarding_screen.dart';
 import 'package:zplit/ui/onboarding/widgets/Splash_screen.dart';
+import 'package:zplit/ui/settlement/widgets/settlement_screen.dart';
 import 'package:zplit/ui/transaction/widgets/analytics_screen.dart';
 import 'package:zplit/ui/transaction/widgets/expense.dart';
 import 'package:zplit/ui/group/widgets/friends_Detail.dart';
@@ -24,6 +25,7 @@ abstract class AppRoutes {
   static const profile = '/profile';
   static const analytics = '/analytics';
   static const qrScanner = '/qr-scanner';
+  static const settlement = '/settlement';
 }
 
 class AppRouter {
@@ -68,6 +70,18 @@ class AppRouter {
 
       case AppRoutes.qrScanner:
         return _slide(const QrScannerScreen(), settings);
+
+      case AppRoutes.settlement:
+        final args = settings.arguments as Map<String, dynamic>;
+        return _slide(
+          SettlementScreen(
+            friendName: args['friendName'] as String,
+            friendWalletAddress: args['friendWalletAddress'] as String,
+            balanceInInr: (args['balanceInInr'] as num).toDouble(),
+            balanceInUsdc: (args['balanceInUsdc'] as num).toDouble(),
+          ),
+          settings,
+        );
 
       case AppRoutes.profile:
         return _slide(const ProfileScreen(), settings);

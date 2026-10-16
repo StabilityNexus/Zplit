@@ -26,6 +26,10 @@ class FriendDetailScreen extends StatefulWidget {
 }
 
 class _FriendDetailScreenState extends State<FriendDetailScreen> {
+  // TODO: replace with a live INR→USD rate fetch. Hardcoded placeholder
+  // so settlement isn't blocked on adding a network/FX dependency.
+  static const double _placeholderInrPerUsd = 83.0;
+
   bool get _hasFriendPicture =>
       widget.friend.profilePicture != null &&
       File(widget.friend.profilePicture!).existsSync();
@@ -34,6 +38,45 @@ class _FriendDetailScreenState extends State<FriendDetailScreen> {
   void initState() {
     super.initState();
     context.read<TransactionBloc>().add(LoadAllTransactions());
+  }
+
+  void _onSettleUpTapped(double amountInRupees) {
+    final address = widget.friend.cryptoAddress;
+    if (address == null || address.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${widget.friend.displayName} hasn\'t set up a wallet yet.',
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    if (amountInRupees == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You\'re already settled up.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    final absInr = amountInRupees.abs();
+    final usdcAmount = absInr / _placeholderInrPerUsd;
+
+    Navigator.pushNamed(
+      context,
+      AppRoutes.settlement,
+      arguments: {
+        'friendName': widget.friend.displayName,
+        'friendWalletAddress': address,
+        'balanceInInr': absInr,
+        'balanceInUsdc': usdcAmount,
+      },
+    );
   }
 
   @override
@@ -75,7 +118,7 @@ class _FriendDetailScreenState extends State<FriendDetailScreen> {
                         children: [
                           CircleAvatar(
                             radius: 16,
-                            backgroundColor: colors.primary.withOpacity(0.12),
+                            backgroundColor: colors.primary.withValues(alpha: 0.12),
                             backgroundImage: _hasFriendPicture
                                 ? FileImage(File(widget.friend.profilePicture!))
                                 : null,
@@ -128,7 +171,7 @@ class _FriendDetailScreenState extends State<FriendDetailScreen> {
                 Text(
                   oweLabel,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.55),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -141,7 +184,7 @@ class _FriendDetailScreenState extends State<FriendDetailScreen> {
                     fontWeight: FontWeight.w700,
                     letterSpacing: -1,
                     color: amountInRupees == 0
-                        ? theme.colorScheme.onSurface.withOpacity(0.4)
+                        ? theme.colorScheme.onSurface.withValues(alpha: 0.4)
                         : isPositive
                         ? Colors.green
                         : Colors.red,
@@ -158,6 +201,7 @@ class _FriendDetailScreenState extends State<FriendDetailScreen> {
                       context,
                       Icons.handshake_outlined,
                       'Settle Up',
+                      onTap: () => _onSettleUpTapped(amountInRupees),
                     ),
                     const SizedBox(width: 10),
                     _buildActionChip(context, Icons.send_outlined, 'Remind'),
@@ -215,10 +259,15 @@ class _FriendDetailScreenState extends State<FriendDetailScreen> {
     );
   }
 
-  Widget _buildActionChip(BuildContext context, IconData icon, String label) {
+  Widget _buildActionChip(
+    BuildContext context,
+    IconData icon,
+    String label, {
+    VoidCallback? onTap,
+  }) {
     final colors = Theme.of(context).colorScheme;
     return OutlinedButton.icon(
-      onPressed: () {},
+      onPressed: onTap ?? () {},
       icon: Icon(icon, size: 16, color: colors.primary),
       label: Text(
         label,
@@ -229,7 +278,7 @@ class _FriendDetailScreenState extends State<FriendDetailScreen> {
         ),
       ),
       style: OutlinedButton.styleFrom(
-        side: BorderSide(color: colors.primary.withOpacity(0.4)),
+        side: BorderSide(color: colors.primary.withValues(alpha: 0.4)),
         shape: const StadiumBorder(),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       ),
@@ -382,7 +431,7 @@ class _FriendDetailScreenState extends State<FriendDetailScreen> {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: iconBg.withOpacity(0.12),
+              color: iconBg.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(itemIcon, color: iconBg, size: 20),

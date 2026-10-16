@@ -2,16 +2,28 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:zplit/core/database/tables/transactions_table.dart';
-import 'package:zplit/features/transaction/domain/models/transaction_model.dart';
-import 'package:zplit/features/transaction/domain/repositories/transaction_repository.dart';
-import 'package:zplit/features/transaction/presentation/transaction_bloc.dart';
-import 'package:zplit/features/transaction/presentation/transaction_event.dart';
-import 'package:zplit/features/transaction/presentation/transaction_state.dart';
+import 'package:zplit/domain/models/transaction/transaction_model.dart';
+import 'package:zplit/domain/repositories/transaction/transaction_repository.dart';
+import 'package:zplit/ui/balance/view_model/balance_bloc.dart';
+import 'package:zplit/ui/balance/view_model/balance_event.dart';
+import 'package:zplit/ui/balance/view_model/balance_state.dart';
+import 'package:zplit/ui/transaction/view_model/transaction_bloc.dart';
+import 'package:zplit/ui/transaction/view_model/transaction_event.dart';
+import 'package:zplit/ui/transaction/view_model/transaction_state.dart';
 
 class MockTransactionRepository extends Mock implements TransactionRepository {}
 
+class MockBalanceBloc extends MockBloc<BalanceEvent, BalanceState>
+    implements BalanceBloc {}
+
 void main() {
+  setUpAll(() {
+    registerFallbackValue(BigInt.zero);
+    registerFallbackValue(LoadAllBalances());
+  });
+
   late MockTransactionRepository mockRepo;
+  late MockBalanceBloc mockBalanceBloc;
   late TransactionBloc transactionBloc;
 
   final tTransaction1 = TransactionModel(
@@ -46,7 +58,11 @@ void main() {
 
   setUp(() {
     mockRepo = MockTransactionRepository();
-    transactionBloc = TransactionBloc(transactionRepository: mockRepo);
+    mockBalanceBloc = MockBalanceBloc();
+    transactionBloc = TransactionBloc(
+      transactionRepository: mockRepo,
+      balanceBloc: mockBalanceBloc,
+    );
   });
 
   tearDown(() {
@@ -287,11 +303,7 @@ void main() {
   });
 
   group('AcceptTransaction', () {
-    final tAcceptEvent = AcceptTransaction(
-      transactionId: 'tx_001',
-      receiverSignature: 'sig_bob',
-      signedBalancePayload: 'payload_signed',
-    );
+    final tAcceptEvent = AcceptTransaction(transactionId: 'tx_001');
 
     blocTest<TransactionBloc, TransactionState>(
       'emits [TransactionLoading, TransactionLoaded] after successful accept',
@@ -299,8 +311,6 @@ void main() {
         when(
           () => mockRepo.acceptTransaction(
             transactionId: any(named: 'transactionId'),
-            receiverSignature: any(named: 'receiverSignature'),
-            signedBalancePayload: any(named: 'signedBalancePayload'),
           ),
         ).thenAnswer((_) async {});
         when(
@@ -312,12 +322,10 @@ void main() {
       expect: () => [isA<TransactionLoading>(), isA<TransactionLoaded>()],
       verify: (_) {
         verify(
-          () => mockRepo.acceptTransaction(
-            transactionId: 'tx_001',
-            receiverSignature: 'sig_bob',
-            signedBalancePayload: 'payload_signed',
-          ),
+          () => mockRepo.acceptTransaction(transactionId: 'tx_001'),
         ).called(1);
+        verify(() => mockBalanceBloc.add(any(that: isA<LoadAllBalances>())))
+            .called(1);
       },
     );
 
@@ -327,8 +335,6 @@ void main() {
         when(
           () => mockRepo.acceptTransaction(
             transactionId: any(named: 'transactionId'),
-            receiverSignature: any(named: 'receiverSignature'),
-            signedBalancePayload: any(named: 'signedBalancePayload'),
           ),
         ).thenThrow(Exception('Transaction not found'));
         return transactionBloc;

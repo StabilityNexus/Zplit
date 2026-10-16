@@ -1,24 +1,10 @@
 // Widget tests for FriendDetailScreen.
 //
-// ASSUMPTIONS — please verify against your real code:
-//   1. Import path for FriendDetailScreen below is a guess based on your
-//      ui/<feature>/view_model + widgets convention. Fix it.
-//   2. TransactionBloc states are assumed to be TransactionLoading(),
-//      TransactionError(String message), TransactionLoaded(List<TransactionModel>)
-//      — all with POSITIONAL constructor args (confirmed for TransactionLoaded
-//      from a build error; TransactionError is still an assumption, fix if wrong).
-//   3. LoadAllTransactions is assumed to take no constructor args.
-//   4. TransactionStatus is an enum from transactions_table.dart — since I
-//      don't know your member names, fixtures default to
-//      TransactionStatus.values.first. Swap in a specific value
-//      (e.g. TransactionStatus.confirmed) if a test needs to care about it.
-//
-// Dev dependencies needed in pubspec.yaml:
-//   dev_dependencies:
-//     flutter_test:
-//       sdk: flutter
-//     bloc_test: ^9.1.7
-//     mocktail: ^1.0.4
+// Amounts (balance.netAmount and tx.amount) are stored in paise and rendered
+// in rupees with two decimals. The "who paid" label on each row is derived
+// from the sign of tx.amount, not from who created the record:
+//   amount > 0 -> fromUser owes toUser -> toUser paid
+//   amount < 0 -> toUser owes fromUser -> fromUser paid
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
@@ -64,6 +50,7 @@ void main() {
 
   var txCounter = 0;
 
+  /// [amount] is in paise.
   TransactionModel buildTx({
     required String from,
     required String to,
@@ -72,7 +59,6 @@ void main() {
     String? tag,
     required DateTime createdAt,
     String currency = '₹',
-    TransactionStatus? status,
   }) {
     txCounter++;
     return TransactionModel(
@@ -81,13 +67,14 @@ void main() {
       toUserPublicKey: to,
       amount: BigInt.from(amount),
       currency: currency,
-      status: status ?? TransactionStatus.values.first,
+      status: TransactionStatus.unsigned,
       description: description,
       tag: tag,
       createdAt: createdAt,
     );
   }
 
+  /// [netAmount] is in paise.
   BalanceModel buildBalance({required int netAmount, String currency = '₹'}) {
     return BalanceModel(
       userPublicKey: friend.publicKey,
@@ -98,10 +85,10 @@ void main() {
   }
 
   Widget buildSubject({BalanceModel? balance}) {
-    return MaterialApp(
-      home: BlocProvider<TransactionBloc>.value(
-        value: transactionBloc,
-        child: FriendDetailScreen(
+    return BlocProvider<TransactionBloc>.value(
+      value: transactionBloc,
+      child: MaterialApp(
+        home: FriendDetailScreen(
           friend: friend,
           currentUserPublicKey: currentUser,
           balance: balance,
@@ -138,6 +125,17 @@ void main() {
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
+
+    testWidgets('renders the friend name and initial in the top bar', (
+      tester,
+    ) async {
+      stub(TransactionLoaded([]));
+
+      await tester.pumpWidget(buildSubject());
+
+      expect(find.text('Aanya Shah'), findsOneWidget);
+      expect(find.text('A'), findsOneWidget);
+    });
   });
 
   group('error state', () {
@@ -168,11 +166,11 @@ void main() {
       stub(TransactionLoaded([]));
 
       await tester.pumpWidget(
-        buildSubject(balance: buildBalance(netAmount: 450)),
+        buildSubject(balance: buildBalance(netAmount: 45000)),
       );
 
-      expect(find.text('${friend.displayName} owes you:'), findsOneWidget);
-      expect(find.text('₹450'), findsOneWidget);
+      expect(find.text('${friend.displayName} owes you'), findsOneWidget);
+      expect(find.text('₹450.00'), findsOneWidget);
     });
 
     testWidgets('shows "you owe" copy and absolute amount when negative', (
@@ -181,11 +179,11 @@ void main() {
       stub(TransactionLoaded([]));
 
       await tester.pumpWidget(
-        buildSubject(balance: buildBalance(netAmount: -120)),
+        buildSubject(balance: buildBalance(netAmount: -12050)),
       );
 
-      expect(find.text('you owe:'), findsOneWidget);
-      expect(find.text('₹120'), findsOneWidget);
+      expect(find.text('you owe ${friend.displayName}'), findsOneWidget);
+      expect(find.text('₹120.50'), findsOneWidget);
     });
 
     testWidgets('shows "Settled" copy when net amount is exactly zero', (
@@ -200,6 +198,18 @@ void main() {
       expect(find.text('you are all settled'), findsOneWidget);
       expect(find.text('Settled'), findsOneWidget);
     });
+
+    testWidgets('renders the Settle Up / Remind / Export actions', (
+      tester,
+    ) async {
+      stub(TransactionLoaded([]));
+
+      await tester.pumpWidget(buildSubject());
+
+      expect(find.text('Settle Up'), findsOneWidget);
+      expect(find.text('Remind'), findsOneWidget);
+      expect(find.text('Export'), findsOneWidget);
+    });
   });
 
   group('transaction list', () {
@@ -211,7 +221,7 @@ void main() {
           buildTx(
             from: currentUser,
             to: 'someone_else',
-            amount: 200,
+            amount: 20000,
             createdAt: DateTime(2026, 6, 1),
           ),
         ]),
@@ -228,23 +238,31 @@ void main() {
         final shared = buildTx(
           from: currentUser,
           to: friend.publicKey,
-          amount: 300,
+          amount: 30000,
           description: 'Groceries run',
           createdAt: DateTime(2026, 6, 10),
+        );
+        final reverse = buildTx(
+          from: friend.publicKey,
+          to: currentUser,
+          amount: 1000,
+          description: 'Movie tickets',
+          createdAt: DateTime(2026, 6, 9),
         );
         final unrelated = buildTx(
           from: currentUser,
           to: 'stranger_pub_key',
-          amount: 999,
+          amount: 99900,
           description: 'Should not show up',
           createdAt: DateTime(2026, 6, 11),
         );
 
-        stub(TransactionLoaded([shared, unrelated]));
+        stub(TransactionLoaded([shared, reverse, unrelated]));
 
         await tester.pumpWidget(buildSubject());
 
         expect(find.text('Groceries run'), findsOneWidget);
+        expect(find.text('Movie tickets'), findsOneWidget);
         expect(find.text('Should not show up'), findsNothing);
       },
     );
@@ -253,14 +271,14 @@ void main() {
       final older = buildTx(
         from: currentUser,
         to: friend.publicKey,
-        amount: 100,
+        amount: 10000,
         description: 'Older expense',
         createdAt: DateTime(2026, 5, 1),
       );
       final newer = buildTx(
         from: friend.publicKey,
         to: currentUser,
-        amount: 100,
+        amount: 10000,
         description: 'Newer expense',
         createdAt: DateTime(2026, 6, 15),
       );
@@ -274,10 +292,7 @@ void main() {
           .map((t) => t.data)
           .toList();
 
-      expect(
-        labels.indexOf('Newer expense') < labels.indexOf('Older expense'),
-        isTrue,
-      );
+      expect(labels, ['Newer expense', 'Older expense']);
     });
 
     testWidgets('groups transactions under a month/year header', (
@@ -288,9 +303,16 @@ void main() {
           buildTx(
             from: currentUser,
             to: friend.publicKey,
-            amount: 50,
+            amount: 5000,
             description: 'Coffee',
             createdAt: DateTime(2026, 6, 5),
+          ),
+          buildTx(
+            from: currentUser,
+            to: friend.publicKey,
+            amount: 5000,
+            description: 'Tea',
+            createdAt: DateTime(2026, 5, 20),
           ),
         ]),
       );
@@ -298,17 +320,22 @@ void main() {
       await tester.pumpWidget(buildSubject());
 
       expect(find.text('June 2026'), findsOneWidget);
+      expect(find.text('May 2026'), findsOneWidget);
+      expect(find.text('05 Jun'), findsOneWidget);
+      expect(find.text('20 May'), findsOneWidget);
     });
 
     testWidgets(
-      'shows "You paid:" and the right icon when current user sent it',
+      'shows "You paid:" when the amount sign says the current user paid',
       (tester) async {
+        // Friend created the record and owes the current user (amount > 0),
+        // so the current user (toUser) paid.
         stub(
           TransactionLoaded([
             buildTx(
-              from: currentUser,
-              to: friend.publicKey,
-              amount: 80,
+              from: friend.publicKey,
+              to: currentUser,
+              amount: 8000,
               description: 'Uber ride',
               createdAt: DateTime(2026, 6, 5),
             ),
@@ -318,19 +345,46 @@ void main() {
         await tester.pumpWidget(buildSubject());
 
         expect(find.text('You paid:'), findsOneWidget);
+        expect(find.text('₹80.00'), findsOneWidget);
         expect(find.byIcon(Icons.local_taxi_outlined), findsOneWidget);
       },
     );
 
     testWidgets(
-      'shows "<friend> paid:" and the right icon when friend sent it',
+      'shows "You paid:" with the magnitude when current user created a '
+      'negative-amount record',
       (tester) async {
         stub(
           TransactionLoaded([
             buildTx(
-              from: friend.publicKey,
-              to: currentUser,
-              amount: 60,
+              from: currentUser,
+              to: friend.publicKey,
+              amount: -2500,
+              description: 'Fuel top-up',
+              createdAt: DateTime(2026, 6, 5),
+            ),
+          ]),
+        );
+
+        await tester.pumpWidget(buildSubject());
+
+        expect(find.text('You paid:'), findsOneWidget);
+        expect(find.text('₹25.00'), findsOneWidget);
+        expect(find.byIcon(Icons.local_gas_station_outlined), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'shows "<friend> paid:" when the amount sign says the friend paid',
+      (tester) async {
+        // Current user created the record and owes the friend (amount > 0),
+        // so the friend (toUser) paid.
+        stub(
+          TransactionLoaded([
+            buildTx(
+              from: currentUser,
+              to: friend.publicKey,
+              amount: 6000,
               description: 'Grocery run',
               createdAt: DateTime(2026, 6, 5),
             ),
@@ -340,9 +394,30 @@ void main() {
         await tester.pumpWidget(buildSubject());
 
         expect(find.text('${friend.displayName} paid:'), findsOneWidget);
+        expect(find.text('₹60.00'), findsOneWidget);
         expect(find.byIcon(Icons.shopping_cart_outlined), findsOneWidget);
       },
     );
+
+    testWidgets('picks the category icon from the tag as well', (tester) async {
+      stub(
+        TransactionLoaded([
+          buildTx(
+            from: currentUser,
+            to: friend.publicKey,
+            amount: 6000,
+            description: 'Dinner',
+            tag: 'Food',
+            createdAt: DateTime(2026, 6, 5),
+          ),
+        ]),
+      );
+
+      await tester.pumpWidget(buildSubject());
+
+      expect(find.text('Dinner'), findsOneWidget);
+      expect(find.byIcon(Icons.restaurant_outlined), findsOneWidget);
+    });
 
     testWidgets(
       'falls back to default label/icon when description matches no category',
@@ -352,7 +427,7 @@ void main() {
             buildTx(
               from: currentUser,
               to: friend.publicKey,
-              amount: 60,
+              amount: 6000,
               description: null,
               createdAt: DateTime(2026, 6, 5),
             ),
@@ -372,16 +447,16 @@ void main() {
       stub(TransactionLoaded([]));
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<TransactionBloc>.value(
-            value: transactionBloc,
-            child: Builder(
+        BlocProvider<TransactionBloc>.value(
+          value: transactionBloc,
+          child: MaterialApp(
+            home: Builder(
               builder: (context) => Scaffold(
                 body: Center(
                   child: ElevatedButton(
                     onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
+                      MaterialPageRoute<void>(
                         builder: (_) => FriendDetailScreen(
                           friend: friend,
                           currentUserPublicKey: currentUser,
@@ -399,11 +474,12 @@ void main() {
 
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
-      expect(find.text('Open'), findsNothing);
+      expect(find.byType(FriendDetailScreen), findsOneWidget);
 
       await tester.tap(find.byIcon(Icons.chevron_left));
       await tester.pumpAndSettle();
 
+      expect(find.byType(FriendDetailScreen), findsNothing);
       expect(find.text('Open'), findsOneWidget);
     });
 
@@ -415,16 +491,16 @@ void main() {
       final pushedRoutes = <String>[];
 
       await tester.pumpWidget(
-        MaterialApp(
-          onGenerateRoute: (settings) {
-            if (settings.name != null) pushedRoutes.add(settings.name!);
-            return MaterialPageRoute(
-              builder: (_) => const Scaffold(body: Text('Add Expense')),
-            );
-          },
-          home: BlocProvider<TransactionBloc>.value(
-            value: transactionBloc,
-            child: FriendDetailScreen(
+        BlocProvider<TransactionBloc>.value(
+          value: transactionBloc,
+          child: MaterialApp(
+            onGenerateRoute: (settings) {
+              if (settings.name != null) pushedRoutes.add(settings.name!);
+              return MaterialPageRoute<void>(
+                builder: (_) => const Scaffold(body: Text('Add Expense')),
+              );
+            },
+            home: FriendDetailScreen(
               friend: friend,
               currentUserPublicKey: currentUser,
             ),
@@ -436,6 +512,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(pushedRoutes, contains(AppRoutes.addExpense));
+      expect(find.text('Add Expense'), findsOneWidget);
     });
   });
 

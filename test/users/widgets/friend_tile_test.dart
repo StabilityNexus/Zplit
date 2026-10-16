@@ -1,10 +1,20 @@
+import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 
 import 'package:zplit/domain/models/balance/balance_model.dart';
 import 'package:zplit/domain/models/user/user_model.dart';
 import 'package:zplit/routing/App_router.dart';
+import 'package:zplit/ui/group/widgets/friends_Detail.dart';
+import 'package:zplit/ui/transaction/view_model/transaction_bloc.dart';
+import 'package:zplit/ui/transaction/view_model/transaction_event.dart';
+import 'package:zplit/ui/transaction/view_model/transaction_state.dart';
 import 'package:zplit/ui/users/widgets/friendtile.dart';
+
+class MockTransactionBloc extends MockBloc<TransactionEvent, TransactionState>
+    implements TransactionBloc {}
 
 UserModel _user({
   String key = '0xABC',
@@ -152,7 +162,7 @@ void main() {
         _wrap(
           FriendTile(
             user: _user(),
-            balance: _balance(amount: 500),
+            balance: _balance(amount: 50000),
             currentUserPublicKey: '0xME',
           ),
         ),
@@ -165,12 +175,12 @@ void main() {
         _wrap(
           FriendTile(
             user: _user(),
-            balance: _balance(amount: 500),
+            balance: _balance(amount: 50000),
             currentUserPublicKey: '0xME',
           ),
         ),
       );
-      expect(find.text('₹500'), findsOneWidget);
+      expect(find.text('₹500.00'), findsOneWidget);
     });
 
     testWidgets('shows "You owe:" when netAmount is negative', (tester) async {
@@ -178,7 +188,7 @@ void main() {
         _wrap(
           FriendTile(
             user: _user(),
-            balance: _balance(amount: -200),
+            balance: _balance(amount: -20000),
             currentUserPublicKey: '0xME',
           ),
         ),
@@ -191,14 +201,14 @@ void main() {
         _wrap(
           FriendTile(
             user: _user(),
-            balance: _balance(amount: -200),
+            balance: _balance(amount: -20000),
             currentUserPublicKey: '0xME',
           ),
         ),
       );
-      // Shows 200, not -200
-      expect(find.text('₹200'), findsOneWidget);
-      expect(find.text('₹-200'), findsNothing);
+      // netAmount is in paise: shows 200.00, not -200.00
+      expect(find.text('₹200.00'), findsOneWidget);
+      expect(find.text('₹-200.00'), findsNothing);
     });
 
     testWidgets('hides amount text when settled', (tester) async {
@@ -211,7 +221,7 @@ void main() {
           ),
         ),
       );
-      expect(find.text('₹0'), findsNothing);
+      expect(find.text('₹0.00'), findsNothing);
     });
 
     testWidgets('shows correct currency symbol from balance', (tester) async {
@@ -219,29 +229,61 @@ void main() {
         _wrap(
           FriendTile(
             user: _user(),
-            balance: _balance(amount: 300, currency: '\$'),
+            balance: _balance(amount: 30000, currency: '\$'),
             currentUserPublicKey: '0xME',
           ),
         ),
       );
-      expect(find.text('\$300'), findsOneWidget);
+      expect(find.text('\$300.00'), findsOneWidget);
     });
-  });
 
-  group('FriendTile – navigation', () {
-    testWidgets('tapping tile does not crash', (tester) async {
+    testWidgets('converts paise to rupees with two decimals', (tester) async {
       await tester.pumpWidget(
         _wrap(
           FriendTile(
             user: _user(),
-            balance: _balance(amount: 100),
+            balance: _balance(amount: 12345),
             currentUserPublicKey: '0xME',
+          ),
+        ),
+      );
+      expect(find.text('₹123.45'), findsOneWidget);
+    });
+  });
+
+  group('FriendTile – navigation', () {
+    testWidgets('tapping tile opens FriendDetailScreen for that friend', (
+      tester,
+    ) async {
+      // FriendDetailScreen reads TransactionBloc from context.
+      final transactionBloc = MockTransactionBloc();
+      when(() => transactionBloc.state).thenReturn(TransactionInitial());
+
+      final user = _user(name: 'Alice');
+      final balance = _balance(amount: 100);
+
+      await tester.pumpWidget(
+        BlocProvider<TransactionBloc>.value(
+          value: transactionBloc,
+          child: _wrap(
+            FriendTile(
+              user: user,
+              balance: balance,
+              currentUserPublicKey: '0xME',
+            ),
           ),
         ),
       );
       await tester.tap(find.byType(InkWell));
       await tester.pumpAndSettle();
-      // No crash — navigation attempted
+
+      expect(tester.takeException(), isNull);
+      final detail = tester.widget<FriendDetailScreen>(
+        find.byType(FriendDetailScreen),
+      );
+      expect(detail.friend, same(user));
+      expect(detail.balance, same(balance));
+      expect(detail.currentUserPublicKey, '0xME');
     });
   });
 }
