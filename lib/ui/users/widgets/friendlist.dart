@@ -95,18 +95,22 @@ class _FriendsListState extends State<FriendsList> {
       if (balance != null && _dateFilter.isNotEmpty) {
         final now = DateTime.now();
         if (_dateFilter == 'last14' &&
-            balance.updatedAt.isBefore(now.subtract(const Duration(days: 14))))
+            balance.updatedAt.isBefore(now.subtract(const Duration(days: 14)))) {
           return false;
+        }
         if (_dateFilter == 'last30' &&
-            balance.updatedAt.isBefore(now.subtract(const Duration(days: 30))))
+            balance.updatedAt.isBefore(now.subtract(const Duration(days: 30)))) {
           return false;
+        }
         if (_dateFilter == 'last60' &&
-            balance.updatedAt.isBefore(now.subtract(const Duration(days: 60))))
+            balance.updatedAt.isBefore(now.subtract(const Duration(days: 60)))) {
           return false;
+        }
         if (_dateFilter == 'custom' && _fromDate != null && _toDate != null) {
           if (balance.updatedAt.isBefore(_fromDate!) ||
-              balance.updatedAt.isAfter(_toDate!))
+              balance.updatedAt.isAfter(_toDate!)) {
             return false;
+          }
         }
       }
 
@@ -164,7 +168,7 @@ class _FriendsListState extends State<FriendsList> {
                       Icons.tune,
                       color: filtersActive
                           ? colors.primary
-                          : colors.primary.withOpacity(0.6),
+                          : colors.primary.withValues(alpha: 0.6),
                       size: 22,
                     ),
                   ),
@@ -183,7 +187,7 @@ class _FriendsListState extends State<FriendsList> {
                             ? 'No results match your filters.'
                             : 'No expenses yet.',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.45),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
                         ),
                       ),
                       if (filtersActive) ...[
@@ -217,7 +221,7 @@ class _FriendsListState extends State<FriendsList> {
                         entry.key,
                         style: theme.textTheme.labelSmall?.copyWith(
                           letterSpacing: 0.5,
-                          color: theme.colorScheme.onSurface.withOpacity(0.45),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -326,13 +330,15 @@ class _FilterSheetState extends State<_FilterSheet> {
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
-    if (picked != null)
+    if (picked != null) {
       setState(() {
-        if (isFrom)
+        if (isFrom) {
           _fromDate = picked;
-        else
+        } else {
           _toDate = picked;
+        }
       });
+    }
   }
 
   String _formatDate(DateTime date) {
@@ -533,7 +539,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                       child: Text(
                         'Clear All',
                         style: TextStyle(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ),
@@ -599,7 +605,7 @@ class _FilterSheetState extends State<_FilterSheet> {
           style: theme.textTheme.bodySmall?.copyWith(
             color: selected
                 ? Colors.white
-                : theme.colorScheme.onSurface.withOpacity(0.7),
+                : theme.colorScheme.onSurface.withValues(alpha: 0.7),
             fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
@@ -636,7 +642,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                 Icon(
                   Icons.keyboard_arrow_down,
                   size: 18,
-                  color: theme.colorScheme.onSurface.withOpacity(0.4),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                 ),
               ],
             ),

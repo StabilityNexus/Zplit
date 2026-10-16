@@ -1,6 +1,5 @@
-import 'dart:convert'; // CHANGED
+import 'dart:convert';
 import 'dart:io';
-import 'package:zplit/ui/transaction/view_model/transaction_state.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,17 +8,21 @@ import 'package:zplit/routing/App_router.dart';
 import 'package:zplit/ui/balance/view_model/balance_bloc.dart';
 import 'package:zplit/ui/balance/view_model/balance_event.dart';
 import 'package:zplit/ui/balance/view_model/balance_state.dart';
-import 'package:zplit/ui/bluetooth/view_model/bluetooth_bloc.dart'; // CHANGED
-import 'package:zplit/ui/bluetooth/view_model/bluetooth_event.dart'; // CHANGED
+import 'package:zplit/ui/bluetooth/view_model/bluetooth_bloc.dart';
+import 'package:zplit/ui/bluetooth/view_model/bluetooth_event.dart';
 import 'package:zplit/ui/deep_link/view_model/deep_link_bloc.dart';
 import 'package:zplit/ui/transaction/view_model/transaction_bloc.dart';
 import 'package:zplit/ui/transaction/view_model/transaction_event.dart';
 import 'package:zplit/ui/users/view_model/user_bloc.dart';
 import 'package:zplit/ui/users/view_model/user_event.dart';
 import 'package:zplit/ui/users/view_model/user_state.dart';
-import 'package:zplit/ui/users/widgets/Homebottomnav.dart';
 import 'package:zplit/ui/transaction/widgets/balance_card.dart';
 import 'package:zplit/ui/users/widgets/friendlist.dart';
+import 'package:zplit/ui/nfc/view_model/nfc_bloc.dart';
+import 'package:zplit/ui/nfc/view_model/nfc_event.dart';
+import 'package:zplit/ui/nfc/view_model/nfc_state.dart';
+import 'package:zplit/ui/wifi/view_model/Wifi_direct_bloc.dart';
+import 'package:zplit/ui/wifi/view_model/Wifi_direct_event.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,7 +34,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  int _selectedNavIndex = 0;
   String? _myAddress;
 
   @override
@@ -45,8 +47,6 @@ class _HomeScreenState extends State<HomeScreen>
 
     context.read<UserBloc>().add(LoadAllUsers());
     context.read<BalanceBloc>().add(LoadAllBalances());
-    context.read<UserBloc>().add(LoadAllUsers());
-    context.read<BalanceBloc>().add(LoadAllBalances());
     context.read<TransactionBloc>().add(LoadAllTransactions());
   }
 
@@ -56,16 +56,45 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
-  void _sendAck(BuildContext context, String txnId, String outcome) {
-    final endpointId = context
-        .read<BluetoothBloc>()
-        .state
-        .lastReceivedFromEndpointId;
-    if (endpointId == null) return;
+  void _sendAck(
+    BuildContext context,
+    String txnId,
+    String outcome,
+    String? viaTransport,
+  ) {
     final payload = jsonEncode({'id': txnId, 'outcome': outcome});
-    context.read<BluetoothBloc>().add(
-      BluetoothSendPayload(endpointId, payload),
-    );
+
+    switch (viaTransport) {
+      case 'bluetooth':
+        final endpointId = context
+            .read<BluetoothBloc>()
+            .state
+            .lastReceivedFromEndpointId;
+        if (endpointId == null) return;
+        context.read<BluetoothBloc>().add(
+          BluetoothSendPayload(endpointId, payload),
+        );
+        break;
+
+      case 'wifi':
+        context.read<WifiBloc>().add(WifiSendPayload(payload));
+        break;
+
+      case 'nfc':
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Response saved locally — tap phones together again to '
+              'let them know',
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        break;
+
+      default:
+        break;
+    }
   }
 
   void _showAcceptRejectSheet(BuildContext context, TransactionReceived state) {
@@ -109,7 +138,12 @@ class _HomeScreenState extends State<HomeScreen>
                     child: OutlinedButton(
                       onPressed: () {
                         transactionBloc.add(RejectTransaction(state.txnId));
-                        _sendAck(context, state.txnId, 'rejected'); // CHANGED
+                        _sendAck(
+                          context,
+                          state.txnId,
+                          'rejected',
+                          state.viaTransport,
+                        ); // CHANGED
                         navigator.pop();
                       },
                       style: OutlinedButton.styleFrom(
@@ -129,7 +163,12 @@ class _HomeScreenState extends State<HomeScreen>
                         transactionBloc.add(
                           AcceptTransaction(transactionId: state.txnId),
                         );
-                        _sendAck(context, state.txnId, 'accepted'); // CHANGED
+                        _sendAck(
+                          context,
+                          state.txnId,
+                          'accepted',
+                          state.viaTransport,
+                        ); // CHANGED
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colors.primary,
@@ -262,9 +301,9 @@ class _HomeScreenState extends State<HomeScreen>
                 onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
                 child: CircleAvatar(
                   radius: 22,
-                  backgroundColor: theme.colorScheme.primary.withOpacity(0.15),
+                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.15),
                   backgroundImage: hasImage
-                      ? FileImage(File(profilePicturePath!))
+                      ? FileImage(File(profilePicturePath))
                       : null,
                   child: !hasImage
                       ? Icon(
@@ -279,6 +318,30 @@ class _HomeScreenState extends State<HomeScreen>
           ),
           Row(
             children: [
+              BlocBuilder<NfcBloc, NfcState>(
+                builder: (context, nfcState) {
+                  return IconButton(
+                    onPressed: nfcState.isBusy
+                        ? null
+                        : () =>
+                              context.read<NfcBloc>().add(NfcStartListening()),
+                    icon: nfcState.isBusy
+                        ? SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: theme.colorScheme.primary,
+                            ),
+                          )
+                        : Icon(
+                            Icons.nfc_rounded,
+                            color: theme.colorScheme.onSurface,
+                            size: 26,
+                          ),
+                  );
+                },
+              ),
               IconButton(
                 onPressed: () =>
                     Navigator.pushNamed(context, AppRoutes.qrScanner),
@@ -348,7 +411,7 @@ class _HomeScreenState extends State<HomeScreen>
         decoration: BoxDecoration(
           color: colors.surface,
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: theme.dividerColor.withOpacity(0.5)),
+          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.5)),
         ),
         child: TabBar(
           controller: _tabController,
@@ -357,7 +420,7 @@ class _HomeScreenState extends State<HomeScreen>
             borderRadius: BorderRadius.circular(25),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 6,
                 offset: const Offset(0, 2),
               ),
@@ -439,49 +502,56 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _buildEmptyState(String? userPublicKey) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: 200,
-            child: Image.asset(
-              'assets/images/homescreen.png',
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => Icon(
-                Icons.receipt_long_outlined,
-                size: 100,
-                color: colors.primary.withOpacity(0.25),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              height: 200,
+              child: Image.asset(
+                'assets/images/homescreen.png',
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => Icon(
+                  Icons.receipt_long_outlined,
+                  size: 100,
+                  color: colors.primary.withValues(alpha: 0.25),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'No Expenses Found',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.55),
-              fontWeight: FontWeight.w500,
+            const SizedBox(height: 20),
+            Text(
+              'No Expenses Found',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          const SizedBox(height: 28),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.addExpense);
-            },
-            icon: const Icon(Icons.add, size: 20),
-            label: const Text(
-              'Add An Expense',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            const SizedBox(height: 28),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(context, AppRoutes.addExpense);
+              },
+              icon: const Icon(Icons.add, size: 20),
+              label: const Text(
+                'Add An Expense',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 14,
+                ),
+                shape: const StadiumBorder(),
+                elevation: 0,
+              ),
             ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colors.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-              shape: const StadiumBorder(),
-              elevation: 0,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

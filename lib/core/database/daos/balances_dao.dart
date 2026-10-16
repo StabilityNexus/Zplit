@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
-import 'package:zplit/core/database/tables/balances_table.dart';
 import 'package:zplit/core/database/app_database.dart';
+import 'package:zplit/core/database/tables/balances_table.dart';
 
-part '../../../generated/balances_dao.g.dart';
+part 'balances_dao.g.dart';
 
 @DriftAccessor(tables: [BalancesTable])
 class BalancesDao extends DatabaseAccessor<AppDatabase>
@@ -19,7 +19,18 @@ class BalancesDao extends DatabaseAccessor<AppDatabase>
     return query.getSingleOrNull();
   }
 
-  // we can just use upsert for update and insert
+  Future<BalancesTableData?> getByPublicKeyAndCurrency(
+    String userPublicKey,
+    String currency,
+  ) {
+    return (select(balancesTable)..where(
+          (tbl) =>
+              tbl.userPublicKey.equals(userPublicKey) &
+              tbl.currency.equals(currency),
+        ))
+        .getSingleOrNull();
+  }
+
   Future<void> upsert(BalancesTableCompanion balance) {
     return into(balancesTable).insertOnConflictUpdate(balance);
   }

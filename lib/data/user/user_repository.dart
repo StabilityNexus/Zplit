@@ -49,6 +49,12 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
+  Future<UserModel?> getCurrentUser() async {
+    final rows = await _usersDao.getAll();
+    return rows.isEmpty ? null : _toModel(rows.first);
+  }
+
+  @override
   Future<int> deleteUser(String publicKey) {
     return _usersDao.deleteUser(publicKey);
   }
