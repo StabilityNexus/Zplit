@@ -8,6 +8,7 @@ class TransactionsTable extends Table {
   TextColumn get fromUserPublicKey =>
       text().references(UsersTable, #publicKey)();
   TextColumn get toUserPublicKey => text().references(UsersTable, #publicKey)();
+
   Int64Column get amount => int64()();
   TextColumn get description => text().nullable()();
   TextColumn get tag => text().nullable()();

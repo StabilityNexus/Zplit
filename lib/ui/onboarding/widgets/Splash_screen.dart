@@ -108,7 +108,7 @@ class _SplashScreenState extends State<SplashScreen>
       listener: (context, state) {
         if (state is UserLoaded) {
           Future.delayed(const Duration(milliseconds: 1200), () {
-            if (!mounted) return;
+            if (!context.mounted) return;
             if (state.users.isEmpty) {
               Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
             } else {
@@ -118,7 +118,7 @@ class _SplashScreenState extends State<SplashScreen>
         }
         if (state is UserError) {
           Future.delayed(const Duration(milliseconds: 1200), () {
-            if (!mounted) return;
+            if (!context.mounted) return;
             Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
           });
         }

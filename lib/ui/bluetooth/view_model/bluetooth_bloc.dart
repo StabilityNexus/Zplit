@@ -163,6 +163,7 @@ class BluetoothBloc extends Bloc<BluetoothEvent, BluetoothState> {
   }
 
   void clearReceivedPayload() {
+    // ignore: invalid_use_of_visible_for_testing_member
     emit(state.copyWith(clearReceived: true));
   }
 

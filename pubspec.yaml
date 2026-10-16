@@ -51,7 +51,11 @@ dependencies:
   mobile_scanner: ^4.0.1
   eth_sig_util: ^0.0.9
   nearby_connections: ^4.3.0
-  permission_handler: ^12.0.3
+  permission_handler: ^11.4.0
+  flutter_nfc_kit: ^3.6.2
+  ndef: ^0.4.0
+  flutter_p2p_connection: ^3.0.3
+  equatable: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -65,6 +69,8 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   drift_dev: ^2.31.0
   build_runner: ^2.15.0
+  bloc_test: ^10.0.0
+  mocktail: ^1.0.5
 
 
 # For information on the generic Dart part of this file, see the

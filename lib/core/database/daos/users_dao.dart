@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
-import 'package:zplit/core/database/tables/users_table.dart';
 import 'package:zplit/core/database/app_database.dart';
+import 'package:zplit/core/database/tables/users_table.dart';
 
-part '../../../generated/users_dao.g.dart';
+part 'users_dao.g.dart';
 
 @DriftAccessor(tables: [UsersTable])
 class UsersDao extends DatabaseAccessor<AppDatabase> with _$UsersDaoMixin {

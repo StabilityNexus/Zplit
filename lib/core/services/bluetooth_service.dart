@@ -160,7 +160,7 @@ class BluetoothTransportService {
       BtConnectionInitiated(
         id,
         info.endpointName,
-        info.authenticationToken ?? '',
+        info.authenticationToken,
       ),
     );
   }

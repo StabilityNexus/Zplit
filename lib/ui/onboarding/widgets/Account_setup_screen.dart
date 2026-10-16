@@ -23,6 +23,8 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
   File? _pickedImage;
   bool _isPickingImage = false;
 
+  bool _hasNavigated = false;
+
   bool get _isValid =>
       _displayNameController.text.trim().isNotEmpty &&
       _usernameController.text.trim().isNotEmpty;
@@ -37,7 +39,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
   void _onFieldsChanged() => setState(() {});
 
   Future<void> _pickImage() async {
-    if (_isPickingImage) return;
+    if (_isPickingImage) return; // 👈
     setState(() => _isPickingImage = true);
     try {
       final picked = await ImagePicker().pickImage(
@@ -59,7 +61,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
   void _onContinue() async {
     if (!_isValid) return;
     final address = await const FlutterSecureStorage().read(key: 'evm_address');
-    if (address == null) return;
+    if (address == null || !mounted) return;
 
     context.read<UserBloc>().add(
       UpsertUser(
@@ -86,7 +88,8 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
 
     return BlocListener<UserBloc, UserState>(
       listener: (context, state) {
-        if (state is UserLoaded && state.users.isNotEmpty) {
+        if (state is UserLoaded && state.users.isNotEmpty && !_hasNavigated) {
+          _hasNavigated = true;
           Navigator.pushReplacementNamed(context, AppRoutes.home);
         }
         if (state is UserError) {

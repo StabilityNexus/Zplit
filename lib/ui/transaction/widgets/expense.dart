@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:zplit/core/services/bluetooth_service.dart' show BtEndpoint;
 import 'package:zplit/core/services/crypto_service.dart';
 import 'package:zplit/ui/bluetooth/view_model/bluetooth_bloc.dart';
@@ -15,6 +13,9 @@ import 'package:zplit/ui/transaction/view_model/transaction_state.dart';
 import 'package:zplit/ui/transaction/widgets/TransactionSentscreen.dart';
 import 'package:zplit/ui/users/view_model/user_bloc.dart';
 import 'package:zplit/ui/users/view_model/user_state.dart';
+import 'package:zplit/ui/wifi/view_model/Wifi_direct_bloc.dart';
+import 'package:zplit/ui/wifi/view_model/Wifi_direct_event.dart';
+import 'package:zplit/ui/wifi/view_model/Wifi_direct_state.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({super.key});
@@ -92,6 +93,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     if (userState is! UserLoaded) return;
 
     const FlutterSecureStorage().read(key: 'evm_address').then((me) {
+      if (!mounted) return;
       final friends = userState.users.where((u) => u.publicKey != me).toList();
 
       if (friends.isEmpty) {
@@ -129,7 +131,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     (f) => ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: CircleAvatar(
-                        backgroundColor: theme.colorScheme.primary.withOpacity(
+                        backgroundColor: theme.colorScheme.primary.withValues(alpha: 
                           0.12,
                         ),
                         child: Text(
@@ -193,6 +195,21 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     return null;
   }
 
+  // WiFi Direct here is a single 1-to-1 link (unlike Bluetooth, which
+  // tracks multiple nearby endpoints at once). WifiState.peerName is
+  // NOT the friend's app display name — on the client side it's
+  // currently always the literal string 'Host' (see
+  // WifiDirectTransportService._becomeClient), and on the host side
+  // it's the peer's raw device model name (e.g. 'SM-E146B'), not
+  // their Zplit display name. Matching peerName against
+  // friendDisplayName therefore fails on every real send. Since
+  // there's only ever one possible peer in this flow, being connected
+  // at all is sufficient signal that we're talking to the selected
+  // friend.
+  bool _isWifiConnectedToFriend(WifiState wifiState, String friendDisplayName) {
+    return wifiState.isConnected;
+  }
+
   Future<void> _sendExpense() async {
     final totalAmount = double.tryParse(_amountController.text.trim());
     if (totalAmount == null || totalAmount <= 0) {
@@ -234,6 +251,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         tag: tag,
         timestamp: ts,
       );
+      if (!mounted) return;
 
       context.read<TransactionBloc>().add(
         CreateTransaction(
@@ -263,24 +281,32 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         'sig': senderSignature,
       };
 
+      final jsonPayload = jsonEncode(payload);
+
       bool sentViaBluetooth = false;
       String? bluetoothEndpointId;
-      final jsonPayload = jsonEncode(payload);
       final btState = context.read<BluetoothBloc>().state;
-      final endpoint = _findConnectedEndpointForFriend(
+      final btEndpoint = _findConnectedEndpointForFriend(
         btState,
         _selectedFriendName!,
       );
-      if (endpoint != null) {
+      if (btEndpoint != null) {
         context.read<BluetoothBloc>().add(
-          BluetoothSendPayload(endpoint.id, jsonPayload),
+          BluetoothSendPayload(btEndpoint.id, jsonPayload),
         );
         sentViaBluetooth = true;
-        bluetoothEndpointId = endpoint.id;
+        bluetoothEndpointId = btEndpoint.id;
+      }
+
+      bool sentViaWifi = false;
+      final wifiState = context.read<WifiBloc>().state;
+      if (_isWifiConnectedToFriend(wifiState, _selectedFriendName!)) {
+        context.read<WifiBloc>().add(WifiSendPayload(jsonPayload));
+        sentViaWifi = true;
       }
 
       final encoded = base64Url.encode(utf8.encode(jsonPayload));
-      final link = 'zplit://tx/v1?d=$encoded';
+      final link = 'https://zplit.aossie.org/tx?d=$encoded';
 
       if (!mounted) return;
 
@@ -298,6 +324,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             sentViaBluetooth: sentViaBluetooth,
             bluetoothEndpointId: bluetoothEndpointId,
             bluetoothJsonPayload: sentViaBluetooth ? jsonPayload : null,
+            nfcJsonPayload: jsonPayload,
+            sentViaWifi: sentViaWifi,
+            wifiJsonPayload: sentViaWifi ? jsonPayload : null,
           ),
         ),
       );
@@ -325,8 +354,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
     return BlocListener<TransactionBloc, TransactionState>(
       listener: (context, state) {
-        if (state is TransactionError)
+        if (state is TransactionError) {
           _showSnack('Transaction error: ${state.message}');
+        }
       },
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
@@ -401,7 +431,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                           style: theme.textTheme.bodyLarge?.copyWith(
                             color: _selectedDate != null
                                 ? theme.colorScheme.onSurface
-                                : theme.colorScheme.onSurface.withOpacity(0.4),
+                                : theme.colorScheme.onSurface.withValues(alpha: 0.4),
                           ),
                         ),
                       ),
@@ -430,7 +460,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     children: [
                       CircleAvatar(
                         radius: 16,
-                        backgroundColor: colors.primary.withOpacity(0.12),
+                        backgroundColor: colors.primary.withValues(alpha: 0.12),
                         child: Icon(
                           Icons.person,
                           color: colors.primary,
@@ -449,12 +479,12 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                         Icon(
                           Icons.arrow_forward,
                           size: 14,
-                          color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
                         const SizedBox(width: 8),
                         CircleAvatar(
                           radius: 16,
-                          backgroundColor: colors.primary.withOpacity(0.12),
+                          backgroundColor: colors.primary.withValues(alpha: 0.12),
                           child: Text(
                             _selectedFriendName![0].toUpperCase(),
                             style: TextStyle(
@@ -505,14 +535,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                               : _selectedSplit,
                           style: theme.textTheme.bodyLarge?.copyWith(
                             color: _selectedSplit.isEmpty
-                                ? theme.colorScheme.onSurface.withOpacity(0.4)
+                                ? theme.colorScheme.onSurface.withValues(alpha: 0.4)
                                 : theme.colorScheme.onSurface,
                           ),
                         ),
                       ),
                       Icon(
                         Icons.keyboard_arrow_down,
-                        color: theme.colorScheme.onSurface.withOpacity(0.5),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         size: 22,
                       ),
                     ],
@@ -567,7 +597,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? colors.primary.withOpacity(0.1)
+                              ? colors.primary.withValues(alpha: 0.1)
                               : Colors.transparent,
                           border: Border.all(
                             color: isSelected
@@ -581,7 +611,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: isSelected
                                 ? colors.primary
-                                : theme.colorScheme.onSurface.withOpacity(0.7),
+                                : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                             fontWeight: isSelected
                                 ? FontWeight.w600
                                 : FontWeight.normal,
@@ -607,7 +637,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     contentPadding: const EdgeInsets.all(16),
                     hintText: 'Optional notes...',
                     hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.3),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                     ),
                   ),
                 ),
@@ -671,7 +701,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: colors.primary.withOpacity(0.06),
+        color: colors.primary.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -695,7 +725,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       text,
       style: theme.textTheme.bodySmall?.copyWith(
         fontWeight: FontWeight.w600,
-        color: theme.colorScheme.onSurface.withOpacity(0.55),
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
         fontSize: 12,
         letterSpacing: 0.3,
       ),
@@ -724,7 +754,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           ),
           hintText: hint,
           hintStyle: theme.textTheme.bodyLarge?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.35),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.35),
           ),
           suffixIcon: suffix != null
               ? Padding(
@@ -745,7 +775,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     return BoxDecoration(
       color: theme.cardColor,
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: theme.dividerColor.withOpacity(0.7)),
+      border: Border.all(color: theme.dividerColor.withValues(alpha: 0.7)),
     );
   }
 
@@ -778,7 +808,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   subtitle: Text(
                     _splitSubtitle(option),
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                   trailing: _selectedSplit == option

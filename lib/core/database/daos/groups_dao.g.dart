@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../core/database/daos/groups_dao.dart';
+part of 'groups_dao.dart';
 
 // ignore_for_file: type=lint
 mixin _$GroupsDaoMixin on DatabaseAccessor<AppDatabase> {
