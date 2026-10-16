@@ -68,7 +68,7 @@ class FriendTile extends StatelessWidget {
             // Avatar
             CircleAvatar(
               radius: 24,
-              backgroundColor: colors.primary.withOpacity(0.12),
+              backgroundColor: colors.primary.withValues(alpha: 0.12),
               backgroundImage: hasImage
                   ? FileImage(File(user.profilePicture!))
                   : null,
@@ -101,9 +101,9 @@ class FriendTile extends StatelessWidget {
                   if (balance != null) ...[
                     const SizedBox(height: 2),
                     Text(
-                      '${_formatDate(balance!.updatedAt)}',
+                      _formatDate(balance!.updatedAt),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.45),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
                         fontSize: 12,
                       ),
                     ),

@@ -18,6 +18,13 @@ class TransactionReceived extends DeepLinkState {
   final double amount;
   final String desc;
   final String? tag;
+
+  /// Which transport this transaction arrived over — 'bluetooth',
+  /// 'nfc', 'wifi', or null for QR/deep-link (no reply channel).
+  /// Used by home_screen._sendAck to route the accept/reject
+  /// response back the same way it came in.
+  final String? viaTransport;
+
   TransactionReceived({
     required this.txnId,
     required this.fromUserId,
@@ -25,6 +32,7 @@ class TransactionReceived extends DeepLinkState {
     required this.amount,
     required this.desc,
     this.tag,
+    this.viaTransport,
   });
 }
 

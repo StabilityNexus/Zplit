@@ -24,7 +24,7 @@ class HomeBottomNav extends StatelessWidget {
           border: Border.all(color: theme.dividerColor),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(
+              color: Colors.black.withValues(alpha: 
                 theme.brightness == Brightness.dark ? 0.12 : 0.05,
               ),
               blurRadius: 24,

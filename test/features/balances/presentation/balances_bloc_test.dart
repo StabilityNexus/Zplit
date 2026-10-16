@@ -1,11 +1,11 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:zplit/features/balance/domain/models/balance_model.dart';
-import 'package:zplit/features/balance/domain/repositories/balance_repository.dart';
-import 'package:zplit/features/balance/presentation/balance_bloc.dart';
-import 'package:zplit/features/balance/presentation/balance_event.dart';
-import 'package:zplit/features/balance/presentation/balance_state.dart';
+import 'package:zplit/domain/models/balance/balance_model.dart';
+import 'package:zplit/domain/repositories/balance/balance_repository.dart';
+import 'package:zplit/ui/balance/view_model/balance_bloc.dart';
+import 'package:zplit/ui/balance/view_model/balance_event.dart';
+import 'package:zplit/ui/balance/view_model/balance_state.dart';
 
 class MockBalanceRepository extends Mock implements BalanceRepository {}
 

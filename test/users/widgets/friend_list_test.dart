@@ -73,13 +73,61 @@ void main() {
       expect(called, isTrue);
     });
 
+    testWidgets('shows "No expenses yet." when users list is empty', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_friendsList());
+      expect(find.text('No expenses yet.'), findsOneWidget);
+      expect(find.text('No results match your filters.'), findsNothing);
+      expect(find.text('Clear filters'), findsNothing);
+    });
+
     testWidgets(
-      'shows "No results match your filters." when users list is empty',
+      'shows "No results match your filters." when filters hide everyone',
       (tester) async {
-        await tester.pumpWidget(_friendsList());
+        await tester.pumpWidget(
+          _friendsList(
+            users: [_user(key: '0xA', name: 'Alice')],
+            balances: [_balance(key: '0xA', amount: 100)],
+          ),
+        );
+
+        await tester.tap(find.byIcon(Icons.tune));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('You owe them'));
+        await tester.pump();
+        await tester.tap(find.text('Apply Filters'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Alice'), findsNothing);
         expect(find.text('No results match your filters.'), findsOneWidget);
+        expect(find.text('Clear filters'), findsOneWidget);
       },
     );
+
+    testWidgets('inline "Clear filters" button restores the list', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _friendsList(
+          users: [_user(key: '0xA', name: 'Alice')],
+          balances: [_balance(key: '0xA', amount: 100)],
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.tune));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('You owe them'));
+      await tester.pump();
+      await tester.tap(find.text('Apply Filters'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Clear filters'));
+      await tester.pump();
+
+      expect(find.text('Alice'), findsOneWidget);
+      expect(find.text('No results match your filters.'), findsNothing);
+    });
 
     testWidgets('shows friend names when users provided', (tester) async {
       await tester.pumpWidget(
@@ -340,10 +388,20 @@ void main() {
       await tester.pumpWidget(_friendsList());
       await tester.tap(find.byIcon(Icons.tune));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Custom date range'));
-      await tester.pumpAndSettle();
+
+      // Before: only the Amount Range "From"/"To" labels exist.
       expect(find.text('From'), findsOneWidget);
       expect(find.text('To'), findsOneWidget);
+      expect(find.text('Select'), findsNothing);
+
+      await tester.tap(find.text('Custom date range'));
+      await tester.pumpAndSettle();
+
+      // After: the date pickers add their own "From"/"To" labels, each
+      // showing a "Select" placeholder.
+      expect(find.text('From'), findsNWidgets(2));
+      expect(find.text('To'), findsNWidgets(2));
+      expect(find.text('Select'), findsNWidgets(2));
     });
   });
 
@@ -354,12 +412,13 @@ void main() {
       await tester.pumpWidget(
         _friendsList(
           users: [
-            _user(key: '0xA', name: 'Alice'), // amount 50 — below range
-            _user(key: '0xB', name: 'Bob'), // amount 500 — in range
+            _user(key: '0xA', name: 'Alice'), // ₹50 — below range
+            _user(key: '0xB', name: 'Bob'), // ₹500 — in range
           ],
+          // netAmount is stored in paise; the filter compares in rupees.
           balances: [
-            _balance(key: '0xA', amount: 50),
-            _balance(key: '0xB', amount: 500),
+            _balance(key: '0xA', amount: 5000),
+            _balance(key: '0xB', amount: 50000),
           ],
         ),
       );
@@ -377,6 +436,33 @@ void main() {
 
       expect(find.text('Alice'), findsNothing); // 50 < 100 → filtered
       expect(find.text('Bob'), findsOneWidget); // 500 >= 100 → shown
+    });
+
+    testWidgets('amount "To" filters out friends above range', (tester) async {
+      await tester.pumpWidget(
+        _friendsList(
+          users: [
+            _user(key: '0xA', name: 'Alice'), // ₹50 — in range
+            _user(key: '0xB', name: 'Bob'), // ₹500 — above range
+          ],
+          balances: [
+            _balance(key: '0xA', amount: 5000),
+            _balance(key: '0xB', amount: 50000),
+          ],
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.tune));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField).at(1), '100');
+      await tester.pump();
+
+      await tester.tap(find.text('Apply Filters'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Alice'), findsOneWidget);
+      expect(find.text('Bob'), findsNothing);
     });
   });
 }

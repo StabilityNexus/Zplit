@@ -3,6 +3,10 @@ description: "An Open-Source Decentralized Payment Splitting App"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/zplit_logo.png"
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -16,7 +20,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.2+3
 
 environment:
   sdk: ^3.9.2
@@ -51,7 +55,14 @@ dependencies:
   mobile_scanner: ^4.0.1
   eth_sig_util: ^0.0.9
   nearby_connections: ^4.3.0
-  permission_handler: ^12.0.3
+  permission_handler: ^11.4.0
+  flutter_nfc_kit: ^3.6.2
+  ndef: ^0.4.0
+  flutter_p2p_connection: ^3.0.3
+  google_mlkit_text_recognition: ^0.16.0
+  fl_chart: ^0.69.0
+  url_launcher: ^6.3.1
+  equatable: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -65,6 +76,9 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   drift_dev: ^2.31.0
   build_runner: ^2.15.0
+  flutter_launcher_icons: ^0.14.3
+  bloc_test: ^10.0.0
+  mocktail: ^1.0.5
 
 
 # For information on the generic Dart part of this file, see the
@@ -80,6 +94,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+  - assets/images/zplit-logo(1).png
   - assets/images/zplit-logo.png
   - assets/images/onboarding-1.png
   - assets/images/onboarding-2.png

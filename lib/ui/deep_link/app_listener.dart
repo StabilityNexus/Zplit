@@ -30,7 +30,6 @@ class _AppLinkListenerState extends State<AppLinkListener> {
       debugPrint('[AppLinkListener] cold start error: $e');
     }
 
-    // warm start
     _sub = _appLinks.uriLinkStream.listen(
       _dispatch,
       onError: (e) => debugPrint('[AppLinkListener] stream error: $e'),

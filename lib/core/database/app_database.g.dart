@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../core/database/app_database.dart';
+part of 'app_database.dart';
 
 // ignore_for_file: type=lint
 class $UsersTableTable extends UsersTable

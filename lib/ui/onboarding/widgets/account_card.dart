@@ -95,7 +95,7 @@ class AccountSetupCard extends StatelessWidget {
               labelText: 'Display Name',
               hintText: 'e.g. Aarav Shah',
               labelStyle: TextStyle(color: theme.hintColor),
-              hintStyle: TextStyle(color: theme.hintColor.withOpacity(0.5)),
+              hintStyle: TextStyle(color: theme.hintColor.withValues(alpha: 0.5)),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: theme.dividerColor),
@@ -123,7 +123,7 @@ class AccountSetupCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
               labelStyle: TextStyle(color: theme.hintColor),
-              hintStyle: TextStyle(color: theme.hintColor.withOpacity(0.5)),
+              hintStyle: TextStyle(color: theme.hintColor.withValues(alpha: 0.5)),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: theme.dividerColor),
@@ -145,7 +145,7 @@ class AccountSetupCard extends StatelessWidget {
               onPressed: isValid && !isLoading ? onContinue : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
-                disabledBackgroundColor: theme.dividerColor.withOpacity(0.15),
+                disabledBackgroundColor: theme.dividerColor.withValues(alpha: 0.15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
