@@ -23,3 +23,34 @@ class BluetoothTransactionReceived extends DeepLinkEvent {
   final String jsonPayload;
   const BluetoothTransactionReceived(this.jsonPayload);
 }
+
+class NfcInviteReceived extends DeepLinkEvent {
+  final String jsonPayload;
+  const NfcInviteReceived(this.jsonPayload);
+}
+
+class NfcAckReceived extends DeepLinkEvent {
+  final String jsonPayload;
+  const NfcAckReceived(this.jsonPayload);
+}
+
+class NfcTransactionReceived extends DeepLinkEvent {
+  final String jsonPayload;
+  const NfcTransactionReceived(this.jsonPayload);
+}
+// ...existing events unchanged, add:
+
+class WifiInviteReceived extends DeepLinkEvent {
+  final String jsonPayload;
+  const WifiInviteReceived(this.jsonPayload);
+}
+
+class WifiAckReceived extends DeepLinkEvent {
+  final String jsonPayload;
+  const WifiAckReceived(this.jsonPayload);
+}
+
+class WifiTransactionReceived extends DeepLinkEvent {
+  final String jsonPayload;
+  const WifiTransactionReceived(this.jsonPayload);
+}

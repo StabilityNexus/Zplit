@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../core/database/daos/balances_dao.dart';
+part of 'balances_dao.dart';
 
 // ignore_for_file: type=lint
 mixin _$BalancesDaoMixin on DatabaseAccessor<AppDatabase> {

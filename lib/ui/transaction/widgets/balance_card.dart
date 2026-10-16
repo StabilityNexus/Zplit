@@ -60,7 +60,7 @@ class BalanceSummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -84,7 +84,7 @@ class BalanceSummaryCard extends StatelessWidget {
             label,
 
             style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.55),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
             ),
           ),
           const SizedBox(height: 6),

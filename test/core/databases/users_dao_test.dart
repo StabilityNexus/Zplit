@@ -26,6 +26,7 @@ void main() {
         const UsersTableCompanion(
           publicKey: Value('pk_alice'),
           displayName: Value('Alice'),
+          defaultCurrency: Value('USD'),
         ),
       );
 
@@ -40,6 +41,7 @@ void main() {
         const UsersTableCompanion(
           publicKey: Value('pk_bob'),
           displayName: Value('Bob'),
+          defaultCurrency: Value('USD'),
         ),
       );
 
@@ -58,12 +60,14 @@ void main() {
         const UsersTableCompanion(
           publicKey: Value('pk_alice'),
           displayName: Value('Alice'),
+          defaultCurrency: Value('USD'),
         ),
       );
       await dao.upsert(
         const UsersTableCompanion(
           publicKey: Value('pk_alice'),
           displayName: Value('Alice Updated'),
+          defaultCurrency: Value('USD'),
         ),
       );
 
@@ -76,6 +80,7 @@ void main() {
         const UsersTableCompanion(
           publicKey: Value('pk_alice'),
           displayName: Value('Alice'),
+          defaultCurrency: Value('USD'),
         ),
       );
 

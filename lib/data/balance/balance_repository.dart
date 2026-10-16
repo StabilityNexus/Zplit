@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:zplit/core/database/app_database.dart';
 import 'package:zplit/core/database/daos/balances_dao.dart';
-import 'package:zplit/core/database/tables/balances_table.dart';
+
 import 'package:zplit/domain/models/balance/balance_model.dart';
 import 'package:zplit/domain/repositories/balance/balance_repository.dart';
 

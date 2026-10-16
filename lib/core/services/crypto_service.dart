@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:web3dart/crypto.dart';
@@ -86,7 +86,7 @@ class CryptoService {
     final sig = await sign(p);
     assert(() {
       // ignore: avoid_print
-      print('SIGN PAYLOAD: $p');
+      debugPrint('SIGN PAYLOAD: $p');
       return true;
     }());
     return sig;
@@ -122,9 +122,9 @@ class CryptoService {
       );
 
       assert(() {
-        print(' RECOVERED: $recovered');
+        debugPrint(' RECOVERED: $recovered');
 
-        print(' EXPECTED:  $expectedAddress');
+        debugPrint(' EXPECTED:  $expectedAddress');
         return true;
       }());
 
@@ -132,7 +132,7 @@ class CryptoService {
     } catch (e) {
       assert(() {
         // ignore: avoid_print
-        print(' VERIFY ERROR: $e');
+        debugPrint(' VERIFY ERROR: $e');
         return true;
       }());
       return false;

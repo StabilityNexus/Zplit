@@ -1,11 +1,11 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:zplit/features/users/domain/models/user_model.dart';
-import 'package:zplit/features/users/domain/repositories/user_repository.dart';
-import 'package:zplit/features/users/presentation/user_bloc.dart';
-import 'package:zplit/features/users/presentation/user_event.dart';
-import 'package:zplit/features/users/presentation/user_state.dart';
+import 'package:zplit/domain/models/user/user_model.dart';
+import 'package:zplit/domain/repositories/user/user_repository.dart';
+import 'package:zplit/ui/users/view_model/user_bloc.dart';
+import 'package:zplit/ui/users/view_model/user_event.dart';
+import 'package:zplit/ui/users/view_model/user_state.dart';
 
 class MockUserRepository extends Mock implements UserRepository {}
 

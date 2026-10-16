@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:app_links/app_links.dart';
 import 'package:zplit/core/services/crypto_service.dart';
 
@@ -38,10 +39,10 @@ class DeepLinkService {
   Future<Uri?> getInitialLink() async {
     try {
       final uri = await _appLinks.getInitialLink();
-      print(' INITIAL LINK: $uri');
+      debugPrint(' INITIAL LINK: $uri');
       return uri;
     } catch (e) {
-      print(' INITIAL LINK ERROR: $e');
+      debugPrint(' INITIAL LINK ERROR: $e');
       return null;
     }
   }
@@ -50,7 +51,7 @@ class DeepLinkService {
 
   void listen(void Function(Uri uri) onLink) {
     _sub = _appLinks.uriLinkStream.listen((uri) {
-      print(' STREAM LINK: $uri');
+      debugPrint(' STREAM LINK: $uri');
       onLink(uri);
     });
   }
@@ -67,7 +68,7 @@ class DeepLinkService {
       final decoded = utf8.decode(
         base64Url.decode(base64Url.normalize(encoded)),
       );
-      print(' RAW DECODED: $decoded');
+      debugPrint(' RAW DECODED: $decoded');
 
       final json = jsonDecode(decoded) as Map<String, dynamic>;
 
@@ -86,13 +87,13 @@ class DeepLinkService {
           ? null
           : rawTag as String?;
 
-      print(
+      debugPrint(
         ' PARSED: id=$id from=$fromPublicKey amount=$amount tag=$tag desc=$description sig=${senderSignature.isNotEmpty ? '' : ' MISSING'}',
       );
 
       bool isVerified = false;
       if (senderSignature.isEmpty) {
-        print(' No signature in payload — rejecting');
+        debugPrint(' No signature in payload — rejecting');
       } else {
         final amountBigInt = BigInt.from((amount * 100).round());
 
@@ -106,14 +107,14 @@ class DeepLinkService {
           tag: tag,
           timestamp: timestamp,
         );
-        print(' VERIFY PAYLOAD: $verifyPayload');
+        debugPrint(' VERIFY PAYLOAD: $verifyPayload');
 
         isVerified = CryptoService.verify(
           payload: verifyPayload,
           signatureHex: senderSignature,
           expectedAddress: fromPublicKey,
         );
-        print(isVerified ? ' Signature valid' : ' Signature INVALID');
+        debugPrint(isVerified ? ' Signature valid' : ' Signature INVALID');
       }
 
       return DeepLinkTransaction(
@@ -130,7 +131,7 @@ class DeepLinkService {
         isVerified: isVerified,
       );
     } catch (e) {
-      print(' PARSE ERROR: $e');
+      debugPrint(' PARSE ERROR: $e');
       return null;
     }
   }
