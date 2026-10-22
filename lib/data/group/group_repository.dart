@@ -33,12 +33,16 @@ class GroupRepositoryImpl implements GroupRepository {
 
   @override
   Future<void> upsertGroup({
+    String? id,
     required String name,
     String? description,
     List<String> users = const [],
   }) {
     return _groupsDao.upsert(
       GroupsTableCompanion(
+        // No id -> the table generates a new uuid (new group).
+        // With an id -> the existing row is updated.
+        id: id == null ? const Value.absent() : Value(id),
         name: Value(name),
         description: Value(description),
         users: Value(users.join(',')),

@@ -7,12 +7,21 @@ class GetGroupById extends GroupEvent {
   GetGroupById(this.id);
 }
 
+/// Creates a group, or updates an existing one when [id] is provided.
+/// (Before, there was no id here, so every save created a brand-new group and
+/// editing was impossible.)
 class UpsertGroup extends GroupEvent {
+  final String? id;
   final String name;
   final String? description;
   final List<String> users;
 
-  UpsertGroup({required this.name, this.description, this.users = const []});
+  UpsertGroup({
+    this.id,
+    required this.name,
+    this.description,
+    this.users = const [],
+  });
 }
 
 class DeleteGroup extends GroupEvent {

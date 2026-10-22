@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:zplit/ui/transaction/view_model/transaction_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -10,6 +11,10 @@ import 'package:zplit/ui/balance/view_model/balance_state.dart';
 import 'package:zplit/ui/bluetooth/view_model/bluetooth_bloc.dart';
 import 'package:zplit/ui/bluetooth/view_model/bluetooth_event.dart';
 import 'package:zplit/ui/deep_link/view_model/deep_link_bloc.dart';
+import 'package:zplit/ui/group/view_models/group_bloc.dart';
+import 'package:zplit/ui/group/view_models/group_event.dart';
+import 'package:zplit/ui/group/view_models/group_state.dart';
+import 'package:zplit/ui/group/widgets/manage_groups_screen.dart';
 import 'package:zplit/ui/transaction/view_model/transaction_bloc.dart';
 import 'package:zplit/ui/transaction/view_model/transaction_event.dart';
 import 'package:zplit/ui/users/view_model/user_bloc.dart';
@@ -36,9 +41,9 @@ class _HomeScreenState extends State<HomeScreen>
 
   String? _myAddress;
 
-  // FIX: profile picture existence is now checked once, off the build
-  // path, instead of calling File(...).existsSync() synchronously inside
-  // build() on every rebuild (blocking disk I/O on the UI thread).
+  // Profile picture existence is checked once, off the build path, instead
+  // of calling File(...).existsSync() synchronously inside build() on every
+  // rebuild (blocking disk I/O on the UI thread).
   String? _profilePicturePath;
   bool _profilePictureExists = false;
 
@@ -54,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen>
     context.read<UserBloc>().add(LoadAllUsers());
     context.read<BalanceBloc>().add(LoadAllBalances());
     context.read<TransactionBloc>().add(LoadAllTransactions());
+    context.read<GroupBloc>().add(LoadAllGroups());
   }
 
   @override
@@ -73,6 +79,16 @@ class _HomeScreenState extends State<HomeScreen>
 
     final exists = await File(path).exists();
     if (mounted) setState(() => _profilePictureExists = exists);
+  }
+
+  /// Opens the group management screen and reloads the list on return, so
+  /// groups created or deleted there show up here straight away.
+  Future<void> _openManageGroups() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ManageGroupsScreen()),
+    );
+    if (mounted) context.read<GroupBloc>().add(LoadAllGroups());
   }
 
   void _sendAck(
@@ -208,9 +224,8 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  // FIX: labels no longer overflow horizontally on long sender names,
-  // notes, or tags — label stays fixed-width, value wraps and truncates
-  // gracefully instead of pushing off-screen.
+  // Labels no longer overflow horizontally on long sender names, notes, or
+  // tags — label stays fixed-width, value wraps and truncates gracefully.
   Widget _infoRow(ThemeData theme, String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -296,7 +311,14 @@ class _HomeScreenState extends State<HomeScreen>
               const SizedBox(height: 16),
               _buildFriendsGroupsTabs(context),
               const SizedBox(height: 8),
-              Expanded(child: _buildBody()),
+              // The tab bar above is driven by the same controller, so
+              // switching tabs now actually switches the content.
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [_buildBody(), _buildGroupsTab()],
+                ),
+              ),
             ],
           ),
         ),
@@ -323,9 +345,9 @@ class _HomeScreenState extends State<HomeScreen>
                 }
               }
 
-              // FIX: kick off the async existence check here instead of
-              // calling existsSync() inline — doesn't block this build,
-              // and only re-checks disk when the path actually changes.
+              // Kick off the async existence check here instead of calling
+              // existsSync() inline — doesn't block this build, and only
+              // re-checks disk when the path actually changes.
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 _refreshProfilePicture(profilePicturePath);
               });
@@ -455,16 +477,13 @@ class _HomeScreenState extends State<HomeScreen>
         child: TabBar(
           controller: _tabController,
           indicator: BoxDecoration(
-            // FIX: was hardcoded Colors.white — broke dark mode by
-            // showing a bright white pill behind the selected tab
-            // regardless of theme. theme.cardColor tracks light/dark
-            // correctly the same way every other surface in this app
-            // does (see FriendDetailScreen, AddExpenseScreen, etc.).
+            // theme.cardColor tracks light/dark correctly, unlike the
+            // hardcoded Colors.white this used to be.
             color: theme.cardColor,
             borderRadius: BorderRadius.circular(25),
             boxShadow: [
               BoxShadow(
-                               color: Colors.black.withValues(
+                color: Colors.black.withValues(
                   alpha: theme.brightness == Brightness.dark ? 0.24 : 0.08,
                 ),
                 blurRadius: 6,
@@ -541,6 +560,147 @@ class _HomeScreenState extends State<HomeScreen>
             return _buildEmptyState(null);
           },
         );
+      },
+    );
+  }
+
+  /// The Groups tab: every group stored on this device. Groups are local
+  /// only and never synced to friends.
+  Widget _buildGroupsTab() {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return BlocBuilder<GroupBloc, GroupState>(
+      builder: (context, state) {
+        if (state is GroupLoading) {
+          return Center(
+            child: CircularProgressIndicator(color: colors.primary),
+          );
+        }
+
+        if (state is GroupError) return _buildError(state.message);
+
+        if (state is GroupLoaded) {
+          if (state.groups.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.group_outlined,
+                    size: 72,
+                    color: colors.primary.withValues(alpha: 0.25),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No groups yet',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: colors.onSurface.withValues(alpha: 0.55),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: _openManageGroups,
+                    icon: const Icon(Icons.add, size: 20),
+                    label: const Text(
+                      'Create a group',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 14,
+                      ),
+                      shape: const StadiumBorder(),
+                      elevation: 0,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return ListView.separated(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+            itemCount: state.groups.length + 1,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            itemBuilder: (context, i) {
+              if (i == state.groups.length) {
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: _openManageGroups,
+                    icon: const Icon(Icons.edit_outlined, size: 18),
+                    label: const Text('Manage groups'),
+                  ),
+                );
+              }
+
+              final group = state.groups[i];
+              final initial = group.name.isNotEmpty
+                  ? group.name[0].toUpperCase()
+                  : '?';
+              final count = group.users.length;
+              final description = group.description;
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: theme.dividerColor.withValues(alpha: 0.5),
+                  ),
+                ),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: colors.primary.withValues(alpha: 0.15),
+                    child: Text(
+                      initial,
+                      style: TextStyle(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  title: Text(
+                    group.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (description != null && description.isNotEmpty)
+                        Text(
+                          description,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      Text(
+                        '$count ${count == 1 ? 'member' : 'members'}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSurface.withValues(alpha: 0.55),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        }
+
+        // GroupInitial: nothing loaded yet.
+        return const SizedBox.shrink();
       },
     );
   }

@@ -1,0 +1,128 @@
+name: Deploy to Play Store & GitHub Release
+
+on:
+  push:
+    branches:
+      - main # change if your release branch is named differently
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build_and_deploy:
+    name: Build, Release & Deploy
+    runs-on: ubuntu-latest
+
+    env:
+      JAVA_VERSION: '17'
+ 
+      FLUTTER_VERSION: '3.35.x'
+      PACKAGE_NAME: org.aossie.zplit
+
+      KEYSTORE_PATH: android/zplit-release-key.jks
+      KEY_PROPS_PATH: android/key.properties
+      SERVICE_ACCOUNT_PATH: service_account.json
+      AAB_PATH: build/app/outputs/bundle/release/app-release.aab
+      APK_PATH: build/app/outputs/flutter-apk/app-release.apk
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: gradle
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      
+      - name: Generate code (Drift / freezed)
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Decode Android keystore and key properties
+        env:
+          ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
+          ANDROID_KEY_PROPERTIES: ${{ secrets.ANDROID_KEY_PROPERTIES }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE" ] || [ -z "$ANDROID_KEY_PROPERTIES" ]; then
+            echo "::error::ANDROID_KEYSTORE and ANDROID_KEY_PROPERTIES secrets are required for a signed release build."
+            exit 1
+          fi
+          echo "$ANDROID_KEYSTORE" | base64 --decode > "$KEYSTORE_PATH"
+          echo "$ANDROID_KEY_PROPERTIES" | base64 --decode > "$KEY_PROPS_PATH"
+
+      - name: Decode Google Play service account
+        id: check_service_account
+        env:
+          ANDROID_RELEASE_SERVICE_ACCOUNT: ${{ secrets.ANDROID_RELEASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -n "$ANDROID_RELEASE_SERVICE_ACCOUNT" ]; then
+            echo "$ANDROID_RELEASE_SERVICE_ACCOUNT" | base64 --decode > "$SERVICE_ACCOUNT_PATH"
+            echo "has_service_account=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::ANDROID_RELEASE_SERVICE_ACCOUNT secret is not configured. Skipping Play Store upload."
+            echo "has_service_account=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build Android App Bundle (AAB)
+        run: flutter build appbundle --release
+
+      - name: Build Android APK
+        run: flutter build apk --release
+
+      - name: Upload build artifacts (CI storage)
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-builds
+          path: |
+            ${{ env.AAB_PATH }}
+            ${{ env.APK_PATH }}
+
+      - name: Deploy to Play Store (Internal Testing)
+        if: steps.check_service_account.outputs.has_service_account == 'true'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: ${{ env.SERVICE_ACCOUNT_PATH }}
+          packageName: ${{ env.PACKAGE_NAME }}
+          releaseFiles: ${{ env.AAB_PATH }}
+          track: internal
+
+      - name: Read version from pubspec.yaml
+        id: get_version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //g' | tr -d '[:space:]')
+          echo "version=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Release version: v$VERSION"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          name: "Release ${{ steps.get_version.outputs.version }}"
+          generate_release_notes: true
+          files: |
+            ${{ env.AAB_PATH }}
+            ${{ env.APK_PATH }}
+
+      - name: Remove signing material
+        if: always()
+        run: rm -f "$KEYSTORE_PATH" "$KEY_PROPS_PATH" "$SERVICE_ACCOUNT_PATH"

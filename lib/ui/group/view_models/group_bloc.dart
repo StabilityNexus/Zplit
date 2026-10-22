@@ -48,6 +48,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     emit(GroupLoading());
     try {
       await _groupRepository.upsertGroup(
+        id: event.id,
         name: event.name,
         description: event.description,
         users: event.users,

@@ -1,12 +1,26 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:zplit/core/services/bluetooth_service.dart' show BtEndpoint;
+import 'package:zplit/core/services/crypto_service.dart';
+import 'package:zplit/core/services/settlement_config.dart';
 import 'package:zplit/domain/models/balance/balance_model.dart';
 import 'package:zplit/domain/models/transaction/transaction_model.dart';
 import 'package:zplit/domain/models/user/user_model.dart';
+import 'package:zplit/ui/balance/view_model/balance_bloc.dart';
+import 'package:zplit/ui/balance/view_model/balance_event.dart';
+import 'package:zplit/ui/bluetooth/view_model/bluetooth_bloc.dart';
+import 'package:zplit/ui/bluetooth/view_model/bluetooth_event.dart';
+import 'package:zplit/ui/bluetooth/view_model/bluetooth_state.dart';
 import 'package:zplit/ui/transaction/view_model/transaction_bloc.dart';
 import 'package:zplit/ui/transaction/view_model/transaction_event.dart';
 import 'package:zplit/ui/transaction/view_model/transaction_state.dart';
+import 'package:zplit/ui/transaction/widgets/TransactionSentscreen.dart';
+import 'package:zplit/ui/wifi/view_model/Wifi_direct_bloc.dart';
+import 'package:zplit/ui/wifi/view_model/Wifi_direct_event.dart';
+import 'package:zplit/ui/wifi/view_model/Wifi_direct_state.dart';
 import 'package:zplit/routing/App_router.dart';
 
 class FriendDetailScreen extends StatefulWidget {
@@ -26,10 +40,6 @@ class FriendDetailScreen extends StatefulWidget {
 }
 
 class _FriendDetailScreenState extends State<FriendDetailScreen> {
-  // TODO: replace with a live INR→USD rate fetch. Hardcoded placeholder
-  // so settlement isn't blocked on adding a network/FX dependency.
-  static const double _placeholderInrPerUsd = 83.0;
-
   // FIX: profile picture existence is now checked once asynchronously
   // instead of calling File(...).existsSync() synchronously inside
   // build() on every rebuild (blocking disk I/O on the UI thread) —
@@ -50,7 +60,7 @@ class _FriendDetailScreenState extends State<FriendDetailScreen> {
     if (mounted) setState(() => _friendPictureExists = exists);
   }
 
-  void _onSettleUpTapped(double amountInRupees) {
+  Future<void> _onSettleUpTapped(double amountInRupees) async {
     final address = widget.friend.cryptoAddress;
     if (address == null || address.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -74,10 +84,29 @@ class _FriendDetailScreenState extends State<FriendDetailScreen> {
       return;
     }
 
-    final absInr = amountInRupees.abs();
-    final usdcAmount = absInr / _placeholderInrPerUsd;
+    // Positive balance = the friend owes ME. Settlement sends USDC from my
+    // wallet to theirs, so it only makes sense when I owe them.
+    if (amountInRupees > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${widget.friend.displayName} owes you — they need to pay you.',
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
 
-    Navigator.pushNamed(
+    final absInr = amountInRupees.abs();
+    // Single source of truth for the FX rate (SettlementConfig). The
+    // settlement screen recomputes the real amount from absInr with integer
+    // maths; this value is only passed along for compatibility.
+    final usdcAmount = absInr / SettlementConfig.inrPerUsd;
+
+    // The settlement screen pops with `true` once the user confirms they
+    // paid in their wallet, or null if they back out.
+    final result = await Navigator.pushNamed(
       context,
       AppRoutes.settlement,
       arguments: {
@@ -87,6 +116,166 @@ class _FriendDetailScreenState extends State<FriendDetailScreen> {
         'balanceInUsdc': usdcAmount,
       },
     );
+
+    if (!mounted || result != true) return;
+
+    await _recordSettlement(amountInRupees);
+  }
+
+  /// Records the settlement exactly the way AddExpenseScreen records an
+  /// expense: create + sign the transaction, then send it to the friend over
+  /// Bluetooth / WiFi Direct (if connected) and hand off to the sent screen
+  /// for the link / QR / NFC options. The friend then gets the usual
+  /// "Incoming Transaction" prompt, and once they Accept (and the ack comes
+  /// back) the friend's balance clears too.
+  Future<void> _recordSettlement(double amountInRupees) async {
+    try {
+      final me = widget.currentUserPublicKey;
+      final friendKey = widget.friend.publicKey;
+      final friendName = widget.friend.displayName;
+
+      // Same convention as AddExpenseScreen's "You Paid": the amount is
+      // NEGATIVE when the sender (me) paid, which cancels what I owed.
+      final totalAmount = (amountInRupees.abs() * 100).round() / 100.0;
+      final splitAmount = -totalAmount;
+      final signedAmount = BigInt.from((splitAmount * 100).round());
+      const splitType = 'You Paid';
+      const tag = 'settlement';
+
+      const desc = 'Settled via USDC';
+
+      final txnId = DateTime.now().millisecondsSinceEpoch.toString();
+      final ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+      final senderSignature = await CryptoService.signTransaction(
+        id: txnId,
+        fromPublicKey: me,
+        toPublicKey: friendKey,
+        amount: signedAmount,
+        currency: 'INR',
+        description: desc,
+        tag: tag,
+        timestamp: ts,
+      );
+      if (!mounted) return;
+
+      final txBloc = context.read<TransactionBloc>();
+      txBloc.add(
+        CreateTransaction(
+          fromUserPublicKey: me,
+          toUserPublicKey: friendKey,
+          amount: signedAmount,
+          currency: 'INR',
+          description: desc,
+          tag: tag,
+        ),
+      );
+      txBloc.add(
+        SignAsSender(transactionId: txnId, senderSignature: senderSignature),
+      );
+
+      final jsonPayload = jsonEncode({
+        'id': txnId,
+        'from': me,
+        'to': friendKey,
+        'amount': splitAmount,
+        'split': splitType,
+        'totalAmount': totalAmount,
+        'desc': desc,
+        'tag': tag,
+        'ts': ts,
+        'sig': senderSignature,
+      });
+
+      bool sentViaBluetooth = false;
+      String? bluetoothEndpointId;
+      final btState = context.read<BluetoothBloc>().state;
+      final btEndpoint = _findConnectedEndpointForFriend(btState, friendName);
+      if (btEndpoint != null) {
+        context.read<BluetoothBloc>().add(
+          BluetoothSendPayload(btEndpoint.id, jsonPayload),
+        );
+        sentViaBluetooth = true;
+        bluetoothEndpointId = btEndpoint.id;
+      }
+
+      // WiFi Direct is a single 1-to-1 link, so being connected at all
+      // means we are talking to this friend (same reasoning as
+      // AddExpenseScreen._isWifiConnectedToFriend).
+      bool sentViaWifi = false;
+      final wifiState = context.read<WifiBloc>().state;
+      if (wifiState.isConnected) {
+        context.read<WifiBloc>().add(WifiSendPayload(jsonPayload));
+        sentViaWifi = true;
+      }
+
+      // Zplit cannot check the blockchain (no RPC), so the payer's own
+      // confirmation is the proof. Per SettlementConfig, mark the settlement
+      // accepted locally right away so MY balance drops to zero now instead of
+      // waiting for the friend to tap Accept. The short delay lets the create
+      // + sign events above finish writing first.
+      if (SettlementConfig.clearPayerBalanceImmediately) {
+        await Future.delayed(const Duration(milliseconds: 800));
+        if (!mounted) return;
+        txBloc.add(AcceptTransaction(transactionId: txnId));
+        await Future.delayed(const Duration(milliseconds: 400));
+        if (!mounted) return;
+        txBloc.add(LoadAllTransactions());
+        context.read<BalanceBloc>().add(LoadAllBalances());
+      }
+
+      final encoded = base64Url.encode(utf8.encode(jsonPayload));
+      final link = 'https://zplit.aossie.org/tx?d=$encoded';
+
+      if (!mounted) return;
+
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => TransactionSentScreen(
+            friendName: friendName,
+            totalAmount: totalAmount,
+            splitAmount: splitAmount,
+            splitType: splitType,
+            description: desc,
+            tag: tag,
+            deepLink: link,
+            sentViaBluetooth: sentViaBluetooth,
+            bluetoothEndpointId: bluetoothEndpointId,
+            bluetoothJsonPayload: sentViaBluetooth ? jsonPayload : null,
+            nfcJsonPayload: jsonPayload,
+            sentViaWifi: sentViaWifi,
+            wifiJsonPayload: sentViaWifi ? jsonPayload : null,
+          ),
+        ),
+      );
+
+      if (!mounted) return;
+      context.read<TransactionBloc>().add(LoadAllTransactions());
+      context.read<BalanceBloc>().add(LoadAllBalances());
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not record the settlement: $e'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  BtEndpoint? _findConnectedEndpointForFriend(
+    BluetoothState btState,
+    String friendDisplayName,
+  ) {
+    for (final endpoint in btState.nearbyEndpoints) {
+      final status = btState.connectionStatus[endpoint.id];
+      if (endpoint.name == friendDisplayName &&
+          status == BtConnectionStatus.connected) {
+        return endpoint;
+      }
+    }
+    return null;
   }
 
   @override
@@ -203,7 +392,7 @@ class _FriendDetailScreenState extends State<FriendDetailScreen> {
                 Text(
                   amountInRupees == 0
                       ? 'Settled'
-                      : '₹${amountInRupees.abs().toStringAsFixed(2)}', // ✅ correct amount
+                      : '₹${amountInRupees.abs().toStringAsFixed(2)}',
                   style: theme.textTheme.displayLarge?.copyWith(
                     fontSize: 42,
                     fontWeight: FontWeight.w700,
