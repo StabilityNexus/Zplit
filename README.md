@@ -73,55 +73,8 @@ TBD
 
 ---
 
-## Getting Started
-
-### Prerequisites
-
-- Flutter
-- Android Studio/Xcode
-
-### Installation
-
-#### 1. Clone the Repository
-
-```bash
-git clone https://github.com/StabilityNexus/zplit.git
-cd zplit
-```
-
-#### 2. Install Dependencies
-
-Using your preferred package manager:
-
-```bash
-flutter pub get
-```
-
-#### 3. Run the Development Server
-
-Start the app locally:
-
-```bash
-flutter run
-```
-
-
 ## Contributing
 
-We welcome contributions of all kinds! To contribute:
-
-1. Fork the repository and create your feature branch (`git checkout -b feature/AmazingFeature`).
-2. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-3. Run the development workflow commands to ensure code quality:
-   - `flutter test`
-4. Push your branch (`git push origin feature/AmazingFeature`).
-5. Open a Pull Request for review.
-
-If you encounter bugs, need help, or have feature requests:
-
-- Please open an issue in this repository providing detailed information.
-- Describe the problem clearly and include any relevant logs or screenshots.
-
-We appreciate your feedback and contributions!
+We welcome contributions of all kinds! Please read our [Contributing Guide](CONTRIBUTING.md) to learn about the prerequisites, local setup, how to run the app, and the full contribution workflow.
 
 © 2025 The Stable Order.
