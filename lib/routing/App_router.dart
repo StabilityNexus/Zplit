@@ -79,6 +79,7 @@ class AppRouter {
             friendWalletAddress: args['friendWalletAddress'] as String,
             balanceInInr: (args['balanceInInr'] as num).toDouble(),
             balanceInUsdc: (args['balanceInUsdc'] as num).toDouble(),
+            friendPublicKey: (args['friendPublicKey'] as String?) ?? '',
           ),
           settings,
         );

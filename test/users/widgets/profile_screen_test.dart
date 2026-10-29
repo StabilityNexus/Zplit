@@ -78,10 +78,7 @@ void main() {
     ) async {
       _storeAddress(_address);
       givenUserState(
-        UserLoaded([
-          _user(),
-          _user(key: '0xFRIEND0000', name: 'Bob'),
-        ]),
+        UserLoaded([_user(), _user(key: '0xFRIEND0000', name: 'Bob')]),
       );
       await tester.pumpWidget(wrap());
       await tester.pump();
@@ -165,10 +162,14 @@ void main() {
       expect(find.text('Theme'), findsOneWidget);
     });
 
-    testWidgets('shows "Light" as theme trailing value', (tester) async {
+    // The theme now defaults to "System" (follow the phone's light/dark
+    // setting) instead of always "Light".
+    testWidgets('shows "System" as the default theme trailing value', (
+      tester,
+    ) async {
       await tester.pumpWidget(wrap());
       await tester.pump();
-      expect(find.text('Light'), findsOneWidget);
+      expect(find.text('System'), findsOneWidget);
     });
 
     testWidgets('shows Payment History tile', (tester) async {

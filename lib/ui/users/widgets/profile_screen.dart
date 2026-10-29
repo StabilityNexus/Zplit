@@ -4,8 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:zplit/routing/App_router.dart';
 import 'package:zplit/domain/models/user/user_model.dart';
+import 'package:zplit/ui/group/widgets/manage_groups_screen.dart';
+
 import 'package:zplit/ui/users/view_model/user_bloc.dart';
 import 'package:zplit/ui/users/view_model/user_state.dart';
+import 'package:zplit/ui/users/widgets/theme_Screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -67,6 +70,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void _openThemeScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ThemeScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -83,18 +93,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
     final hasImage =
         _profilePictureExists && me?.profilePicture == _checkedPicturePath;
-
-    // FIX: was hardcoded to the literal text 'Light' regardless of the
-    // app's actual theme — now reflects the real current brightness.
-    // Note: this still doesn't let the user actually CHANGE the theme —
-    // onTap is a no-op below, same as before. Wiring a real toggle
-    // needs access to wherever ThemeMode is held (likely a
-    // ValueNotifier or similar passed into MaterialApp in main.dart) —
-    // share that file and this can be made to actually work rather
-    // than just display accurate-but-static text.
-    final currentThemeLabel = theme.brightness == Brightness.dark
-        ? 'Dark'
-        : 'Light';
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -195,13 +193,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 theme,
                 icon: Icons.palette_outlined,
                 title: 'Theme',
-                trailing: Text(
-                  currentThemeLabel,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                // Shows the chosen mode (Light / Dark / System) and updates
+                // live when the user changes it on the theme page.
+                trailing: ValueListenableBuilder<ThemeMode>(
+                  valueListenable: ThemeController.instance.mode,
+                  builder: (context, mode, _) => Text(
+                    ThemeController.label(mode),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
                   ),
                 ),
-                onTap: () {},
+                onTap: () => _openThemeScreen(context),
               ),
               _buildDivider(theme),
               _buildTile(
@@ -215,7 +218,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 theme,
                 icon: Icons.group_outlined,
                 title: 'Manage Friends and Groups',
-                onTap: () {},
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ManageGroupsScreen()),
+                ),
               ),
               _buildDivider(theme),
               _buildTile(

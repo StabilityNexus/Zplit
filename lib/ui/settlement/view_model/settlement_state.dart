@@ -1,14 +1,62 @@
-abstract class SettlementState {}
+class SettlementResult {
+  final bool verified;
+  final String? txHash;
 
-class SettlementInitial extends SettlementState {}
+  final bool pending;
 
-class SettlementLaunching extends SettlementState {}
+  const SettlementResult({
+    required this.verified,
+    this.txHash,
+    this.pending = false,
+  });
+}
 
-class SettlementLaunched extends SettlementState {}
+abstract class SettlementState {
+  const SettlementState();
+}
 
-class SettlementNoWalletFound extends SettlementState {}
+class SettlementInitial extends SettlementState {
+  const SettlementInitial();
+}
+
+class SettlementLaunching extends SettlementState {
+  const SettlementLaunching();
+}
+
+class SettlementAwaitingReturn extends SettlementState {
+  const SettlementAwaitingReturn();
+}
+
+class SettlementConfirming extends SettlementState {
+  final String? notice;
+  const SettlementConfirming({this.notice});
+}
+
+class SettlementVerifying extends SettlementState {
+  const SettlementVerifying();
+}
+
+class SettlementVerified extends SettlementState {
+  final String txHash;
+  final String message;
+  const SettlementVerified(this.txHash, this.message);
+}
+
+class SettlementPending extends SettlementState {
+  final String txHash;
+  final String message;
+  const SettlementPending(this.txHash, this.message);
+}
+
+class SettlementSelfReported extends SettlementState {
+  const SettlementSelfReported();
+}
+
+class SettlementNoWalletFound extends SettlementState {
+  const SettlementNoWalletFound();
+}
 
 class SettlementError extends SettlementState {
   final String message;
-  SettlementError(this.message);
+  const SettlementError(this.message);
 }

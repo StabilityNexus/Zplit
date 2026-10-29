@@ -15,6 +15,9 @@ import 'package:zplit/ui/bluetooth/view_model/bluetooth_bloc.dart';
 import 'package:zplit/ui/bluetooth/view_model/bluetooth_event.dart';
 import 'package:zplit/ui/bluetooth/view_model/bluetooth_state.dart';
 import 'package:zplit/ui/deep_link/view_model/deep_link_bloc.dart';
+import 'package:zplit/ui/group/view_models/group_bloc.dart';
+import 'package:zplit/ui/group/view_models/group_event.dart';
+import 'package:zplit/ui/group/view_models/group_state.dart';
 import 'package:zplit/ui/nfc/view_model/nfc_bloc.dart';
 import 'package:zplit/ui/nfc/view_model/nfc_event.dart';
 import 'package:zplit/ui/nfc/view_model/nfc_state.dart';
@@ -46,6 +49,10 @@ class MockNfcBloc extends MockBloc<NfcEvent, NfcState> implements NfcBloc {}
 class MockBluetoothBloc extends MockBloc<BluetoothEvent, BluetoothState>
     implements BluetoothBloc {}
 
+// HomeScreen now loads groups for its Groups tab.
+class MockGroupBloc extends MockBloc<GroupEvent, GroupState>
+    implements GroupBloc {}
+
 class FakeUserEvent extends Fake implements UserEvent {}
 
 class FakeBalanceEvent extends Fake implements BalanceEvent {}
@@ -54,7 +61,7 @@ class FakeTransactionEvent extends Fake implements TransactionEvent {}
 
 class FakeNfcEvent extends Fake implements NfcEvent {}
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+class FakeGroupEvent extends Fake implements GroupEvent {}
 
 const _myAddress = '0xME000000000000';
 
@@ -87,6 +94,7 @@ void main() {
     registerFallbackValue(FakeBalanceEvent());
     registerFallbackValue(FakeTransactionEvent());
     registerFallbackValue(FakeNfcEvent());
+    registerFallbackValue(FakeGroupEvent());
   });
 
   late MockUserBloc userBloc;
@@ -95,6 +103,7 @@ void main() {
   late MockDeepLinkBloc deepLinkBloc;
   late MockNfcBloc nfcBloc;
   late MockBluetoothBloc bluetoothBloc;
+  late MockGroupBloc groupBloc;
 
   setUp(() {
     userBloc = MockUserBloc();
@@ -103,11 +112,17 @@ void main() {
     deepLinkBloc = MockDeepLinkBloc();
     nfcBloc = MockNfcBloc();
     bluetoothBloc = MockBluetoothBloc();
+    groupBloc = MockGroupBloc();
 
     when(() => transactionBloc.state).thenReturn(TransactionInitial());
     when(() => deepLinkBloc.state).thenReturn(DeepLinkInitial());
     when(() => nfcBloc.state).thenReturn(const NfcState());
     when(() => bluetoothBloc.state).thenReturn(const BluetoothState());
+    whenListen(
+      groupBloc,
+      const Stream<GroupState>.empty(),
+      initialState: GroupInitial(),
+    );
 
     _storeAddress(null);
   });
@@ -121,6 +136,7 @@ void main() {
         BlocProvider<DeepLinkBloc>.value(value: deepLinkBloc),
         BlocProvider<NfcBloc>.value(value: nfcBloc),
         BlocProvider<BluetoothBloc>.value(value: bluetoothBloc),
+        BlocProvider<GroupBloc>.value(value: groupBloc),
       ],
       child: const MaterialApp(
         onGenerateRoute: AppRouter.onGenerateRoute,
@@ -299,6 +315,14 @@ void main() {
       ).called(1);
     });
 
+    testWidgets('dispatches LoadAllGroups on init', (tester) async {
+      givenStates(UserInitial(), BalanceInitial());
+      await pumpHome(tester);
+      verify(
+        () => groupBloc.add(any(that: isA<LoadAllGroups>())),
+      ).called(greaterThanOrEqualTo(1));
+    });
+
     testWidgets('reloads users even if already UserLoaded', (tester) async {
       givenStates(UserLoaded([_user()]), BalanceLoaded([]));
       await pumpHome(tester);
@@ -326,9 +350,7 @@ void main() {
       await pumpHome(tester);
       await tester.tap(find.byIcon(Icons.nfc_rounded));
       await tester.pump();
-      verify(
-        () => nfcBloc.add(any(that: isA<NfcStartListening>())),
-      ).called(1);
+      verify(() => nfcBloc.add(any(that: isA<NfcStartListening>()))).called(1);
     });
 
     testWidgets('NFC button shows spinner and is disabled while busy', (

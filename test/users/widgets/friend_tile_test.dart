@@ -1,20 +1,82 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:zplit/domain/models/balance/balance_model.dart';
 import 'package:zplit/domain/models/user/user_model.dart';
 import 'package:zplit/routing/App_router.dart';
+import 'package:zplit/ui/balance/view_model/balance_bloc.dart';
+import 'package:zplit/ui/balance/view_model/balance_event.dart';
+import 'package:zplit/ui/balance/view_model/balance_state.dart';
+import 'package:zplit/ui/bluetooth/view_model/bluetooth_bloc.dart';
+import 'package:zplit/ui/bluetooth/view_model/bluetooth_event.dart';
+import 'package:zplit/ui/bluetooth/view_model/bluetooth_state.dart';
+import 'package:zplit/ui/deep_link/view_model/deep_link_bloc.dart';
+import 'package:zplit/ui/group/view_models/group_bloc.dart';
+import 'package:zplit/ui/group/view_models/group_event.dart';
+import 'package:zplit/ui/group/view_models/group_state.dart';
 import 'package:zplit/ui/group/widgets/friends_Detail.dart';
+import 'package:zplit/ui/nfc/view_model/nfc_bloc.dart';
+import 'package:zplit/ui/nfc/view_model/nfc_event.dart';
+import 'package:zplit/ui/nfc/view_model/nfc_state.dart';
 import 'package:zplit/ui/transaction/view_model/transaction_bloc.dart';
 import 'package:zplit/ui/transaction/view_model/transaction_event.dart';
 import 'package:zplit/ui/transaction/view_model/transaction_state.dart';
+import 'package:zplit/ui/users/view_model/user_bloc.dart';
+import 'package:zplit/ui/users/view_model/user_event.dart';
+import 'package:zplit/ui/users/view_model/user_state.dart';
 import 'package:zplit/ui/users/widgets/friendtile.dart';
 
 class MockTransactionBloc extends MockBloc<TransactionEvent, TransactionState>
     implements TransactionBloc {}
+
+// The friend page is a full screen, so it (and anything it builds) may look up
+// any of the app's blocs. These quiet stand-ins make that safe in this test.
+class MockUserBloc extends MockBloc<UserEvent, UserState> implements UserBloc {}
+
+class MockBluetoothBloc extends MockBloc<BluetoothEvent, BluetoothState>
+    implements BluetoothBloc {}
+
+class MockNfcBloc extends MockBloc<NfcEvent, NfcState> implements NfcBloc {}
+
+class MockDeepLinkBloc extends MockBloc<DeepLinkEvent, DeepLinkState>
+    implements DeepLinkBloc {}
+
+/// Quiet BalanceBloc stand-in: stays in BalanceLoading and emits nothing.
+///
+/// FriendDetailScreen now reads BalanceBloc. The state is deliberately NOT
+/// BalanceLoaded: while it is not loaded, the screen keeps showing the
+/// `balance:` the test passes in, so existing amount expectations keep
+/// working (a loaded list without this friend would mean "settled").
+class StubBalanceBloc extends MockBloc<BalanceEvent, BalanceState>
+    implements BalanceBloc {}
+
+StubBalanceBloc stubbedBalanceBloc() {
+  final bloc = StubBalanceBloc();
+  whenListen(
+    bloc,
+    const Stream<BalanceState>.empty(),
+    initialState: BalanceLoading(),
+  );
+  return bloc;
+}
+
+/// Quiet GroupBloc stand-in: stays in GroupInitial and emits nothing.
+class StubGroupBloc extends MockBloc<GroupEvent, GroupState>
+    implements GroupBloc {}
+
+StubGroupBloc stubbedGroupBloc() {
+  final bloc = StubGroupBloc();
+  whenListen(
+    bloc,
+    const Stream<GroupState>.empty(),
+    initialState: GroupInitial(),
+  );
+  return bloc;
+}
 
 UserModel _user({
   String key = '0xABC',
@@ -45,6 +107,16 @@ Widget _wrap(Widget child) => MaterialApp(
 );
 
 void main() {
+  setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+  });
+
+  setUp(() {
+    // FriendDetailScreen (opened by the navigation test) reads pending
+    // settlement payments from secure storage.
+    FlutterSecureStorage.setMockInitialValues({});
+  });
+
   group('FriendTile – rendering', () {
     testWidgets('renders without crashing', (tester) async {
       await tester.pumpWidget(
@@ -255,16 +327,36 @@ void main() {
     testWidgets('tapping tile opens FriendDetailScreen for that friend', (
       tester,
     ) async {
-      // FriendDetailScreen reads TransactionBloc from context.
+      // FriendDetailScreen reads TransactionBloc and BalanceBloc from context;
+      // the other blocs are provided too so nothing it builds can fail with
+      // "Could not find the correct Provider".
       final transactionBloc = MockTransactionBloc();
       when(() => transactionBloc.state).thenReturn(TransactionInitial());
+      final balanceBloc = stubbedBalanceBloc();
+      final groupBloc = stubbedGroupBloc();
+      final userBloc = MockUserBloc();
+      when(() => userBloc.state).thenReturn(UserInitial());
+      final bluetoothBloc = MockBluetoothBloc();
+      when(() => bluetoothBloc.state).thenReturn(const BluetoothState());
+      final nfcBloc = MockNfcBloc();
+      when(() => nfcBloc.state).thenReturn(const NfcState());
+      final deepLinkBloc = MockDeepLinkBloc();
+      when(() => deepLinkBloc.state).thenReturn(DeepLinkInitial());
 
       final user = _user(name: 'Alice');
       final balance = _balance(amount: 100);
 
       await tester.pumpWidget(
-        BlocProvider<TransactionBloc>.value(
-          value: transactionBloc,
+        MultiBlocProvider(
+          providers: [
+            BlocProvider<TransactionBloc>.value(value: transactionBloc),
+            BlocProvider<BalanceBloc>.value(value: balanceBloc),
+            BlocProvider<GroupBloc>.value(value: groupBloc),
+            BlocProvider<UserBloc>.value(value: userBloc),
+            BlocProvider<BluetoothBloc>.value(value: bluetoothBloc),
+            BlocProvider<NfcBloc>.value(value: nfcBloc),
+            BlocProvider<DeepLinkBloc>.value(value: deepLinkBloc),
+          ],
           child: _wrap(
             FriendTile(
               user: user,

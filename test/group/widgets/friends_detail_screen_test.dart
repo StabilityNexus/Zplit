@@ -1,14 +1,7 @@
-// Widget tests for FriendDetailScreen.
-//
-// Amounts (balance.netAmount and tx.amount) are stored in paise and rendered
-// in rupees with two decimals. The "who paid" label on each row is derived
-// from the sign of tx.amount, not from who created the record:
-//   amount > 0 -> fromUser owes toUser -> toUser paid
-//   amount < 0 -> toUser owes fromUser -> fromUser paid
-
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -17,6 +10,9 @@ import 'package:zplit/domain/models/balance/balance_model.dart';
 import 'package:zplit/domain/models/transaction/transaction_model.dart';
 import 'package:zplit/domain/models/user/user_model.dart';
 import 'package:zplit/routing/App_router.dart';
+import 'package:zplit/ui/balance/view_model/balance_bloc.dart';
+import 'package:zplit/ui/balance/view_model/balance_event.dart';
+import 'package:zplit/ui/balance/view_model/balance_state.dart';
 import 'package:zplit/ui/group/widgets/friends_Detail.dart';
 import 'package:zplit/ui/transaction/view_model/transaction_bloc.dart';
 import 'package:zplit/ui/transaction/view_model/transaction_event.dart';
@@ -27,15 +23,40 @@ class MockTransactionBloc extends MockBloc<TransactionEvent, TransactionState>
 
 class FakeTransactionEvent extends Fake implements TransactionEvent {}
 
+/// Quiet BalanceBloc stand-in: stays in BalanceLoading and emits nothing.
+///
+/// FriendDetailScreen now reads BalanceBloc. The state is deliberately NOT
+/// BalanceLoaded: while it is not loaded, the screen keeps showing the
+/// `balance:` the test passes in, so existing amount expectations keep
+/// working (a loaded list without this friend would mean "settled").
+class StubBalanceBloc extends MockBloc<BalanceEvent, BalanceState>
+    implements BalanceBloc {}
+
+StubBalanceBloc stubbedBalanceBloc() {
+  final bloc = StubBalanceBloc();
+  whenListen(
+    bloc,
+    const Stream<BalanceState>.empty(),
+    initialState: BalanceLoading(),
+  );
+  return bloc;
+}
+
 void main() {
   late MockTransactionBloc transactionBloc;
+  late StubBalanceBloc balanceBloc;
 
   setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
     registerFallbackValue(FakeTransactionEvent());
   });
 
   setUp(() {
     transactionBloc = MockTransactionBloc();
+    // FriendDetailScreen now reads BalanceBloc (live balance + reload on open).
+    balanceBloc = stubbedBalanceBloc();
+    // It also reads pending settlement payments from secure storage.
+    FlutterSecureStorage.setMockInitialValues({});
   });
 
   // ---- Fixtures ----
@@ -84,10 +105,20 @@ void main() {
     );
   }
 
+  /// Provides every bloc FriendDetailScreen reads from context.
+  Widget withBlocs(Widget child) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<TransactionBloc>.value(value: transactionBloc),
+        BlocProvider<BalanceBloc>.value(value: balanceBloc),
+      ],
+      child: child,
+    );
+  }
+
   Widget buildSubject({BalanceModel? balance}) {
-    return BlocProvider<TransactionBloc>.value(
-      value: transactionBloc,
-      child: MaterialApp(
+    return withBlocs(
+      MaterialApp(
         home: FriendDetailScreen(
           friend: friend,
           currentUserPublicKey: currentUser,
@@ -468,9 +499,8 @@ void main() {
       stub(TransactionLoaded([]));
 
       await tester.pumpWidget(
-        BlocProvider<TransactionBloc>.value(
-          value: transactionBloc,
-          child: MaterialApp(
+        withBlocs(
+          MaterialApp(
             home: Builder(
               builder: (context) => Scaffold(
                 body: Center(
@@ -512,9 +542,8 @@ void main() {
       final pushedRoutes = <String>[];
 
       await tester.pumpWidget(
-        BlocProvider<TransactionBloc>.value(
-          value: transactionBloc,
-          child: MaterialApp(
+        withBlocs(
+          MaterialApp(
             onGenerateRoute: (settings) {
               if (settings.name != null) pushedRoutes.add(settings.name!);
               return MaterialPageRoute<void>(
