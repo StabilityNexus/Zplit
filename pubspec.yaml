@@ -52,7 +52,7 @@ dependencies:
   pointycastle: ^3.9.1
   app_links: ^6.4.1
   share_plus: ^12.0.2
-  mobile_scanner: ^4.0.1
+  mobile_scanner: ^7.5.0
   eth_sig_util: ^0.0.9
   nearby_connections: ^4.3.0
   permission_handler: ^11.4.0
