@@ -11,6 +11,9 @@
 *.cb
 *.cb2
 .*.lb
+*.dart_tool
+build/
+**/build/
 
 ## Intermediate documents:
 *.dvi

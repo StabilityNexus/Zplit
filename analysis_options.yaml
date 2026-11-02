@@ -7,6 +7,13 @@
 
 # The following line activates a set of recommended lints for Flutter apps,
 # packages, and plugins designed to encourage good coding practices.
+analyzer:
+  exclude:
+    # Legacy copies kept unchanged for reference; superseded by
+    # lib/data/transaction/ and lib/ui/transaction/view_model/.
+    - lib/data/transactions/**
+    - lib/ui/transaction/view_models/**
+
 include: package:flutter_lints/flutter.yaml
 
 linter:
@@ -21,6 +28,8 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
+    # Existing screens use PascalCase file names (e.g. Splash_screen.dart).
+    file_names: false
     # avoid_print: false  # Uncomment to disable the `avoid_print` rule
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
 
