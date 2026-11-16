@@ -4,12 +4,14 @@ class OnboardingPage extends StatelessWidget {
   final String title;
   final String body;
   final String imagePath;
+  final Color accentColor;
 
   const OnboardingPage({
     super.key,
     required this.title,
     required this.body,
     required this.imagePath,
+    required this.accentColor,
   });
 
   @override
@@ -40,7 +42,7 @@ class OnboardingPage extends StatelessWidget {
             title,
             textAlign: TextAlign.center,
             style: theme.textTheme.headlineLarge?.copyWith(
-              color: theme.colorScheme.primary, // Green text matching Figma
+              color: accentColor, // Custom Color
               fontWeight: FontWeight.bold,
             ),
           ),

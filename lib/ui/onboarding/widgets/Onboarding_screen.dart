@@ -20,17 +20,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body:
           'Automatically split bills with friends, no manual math needed. Track who owes whom what.',
       imagePath: 'assets/images/onboarding-1.png',
+      accentColor: Color(0xFF408DD2), //blue color
     ),
     OnboardingPage(
       title: 'Total Control',
       body:
           'Zplit does not collect any personal data. All data remains in your own device.',
       imagePath: 'assets/images/onboarding-2.png',
+      accentColor: Color(0xFF2DA22E), //green color
     ),
     OnboardingPage(
       title: 'Smart Spending Insights',
       body: 'Get real-time expense reports and group spending patterns.',
       imagePath: 'assets/images/onboarding-3.png',
+      accentColor: Color(0xFFB331CA), //purple color
     ),
   ];
 
@@ -58,6 +61,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final activeColor = _pages[_currentPage].accentColor; //grab current slide custom color
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -74,7 +78,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: Text(
                     'skip',
                     style: theme.textTheme.labelLarge?.copyWith(
-                      color: theme.colorScheme.primary,
+                      color: activeColor,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -111,10 +115,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         height: 8,
                         decoration: BoxDecoration(
                           color: isActive
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.primary.withValues(
-                                  alpha: 0.2,
-                                ),
+                              ? activeColor
+                              : activeColor.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(4),
                         ),
                       );
@@ -131,7 +133,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: Material(
-                      color: theme.colorScheme.primary,
+                      color: activeColor,
                       shape: const CircleBorder(),
                       elevation: 0,
                       child: InkWell(
@@ -144,9 +146,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: theme.colorScheme.primary.withValues(
-                                  alpha: 0.15,
-                                ),
+                                color: activeColor.withValues(alpha: 0.25),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
