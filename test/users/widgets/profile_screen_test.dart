@@ -189,6 +189,17 @@ void main() {
       await tester.pump();
       expect(find.text('Invite Friends'), findsOneWidget);
     });
+
+    testWidgets('shows leading icons for general settings tiles', (
+      tester,
+    ) async {
+      await tester.pumpWidget(wrap());
+      await tester.pump();
+      expect(find.byIcon(Icons.palette_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.history_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.group_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.person_add_outlined), findsOneWidget);
+    });
   });
 
   group('ProfileScreen – Feedback section', () {
@@ -204,6 +215,16 @@ void main() {
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(find.text('Contact Us'), 200);
       expect(find.text('Contact Us'), findsOneWidget);
+    });
+
+    testWidgets('shows leading icons for feedback and contact tiles', (
+      tester,
+    ) async {
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Feedback'), 200);
+      expect(find.byIcon(Icons.feedback_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.mail_outlined), findsOneWidget);
     });
   });
 
